@@ -1,1 +1,152 @@
-<p>reset-request works!</p>
+<!-- reset-request.component.html -->
+<div class="flex flex-col md:flex-row min-h-screen bg-gray-100 p-4 md:p-8">
+  <div
+    class="flex w-full max-w-screen-2xl mx-auto bg-white rounded-3xl overflow-hidden shadow-xl"
+  >
+    <!-- Left column (Form) -->
+    <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
+      <div class="max-w-md mx-auto w-full">
+        <div class="flex justify-center">
+          <img
+            src="../../../assets/images/logo.jpg"
+            alt="Logo"
+            class="h-32 md:h-40 lg:h-48 mb-4 md:mb-8"
+          />
+        </div>
+        <h1
+          class="text-2xl md:text-3xl font-bold mb-2 md:mb-4 text-center md:text-left"
+        >
+          Recuperar Contraseña
+        </h1>
+        <p class="mb-4 md:mb-8 text-gray-600 text-center md:text-left">
+          Ingresa tu email y te enviaremos instrucciones para restablecer tu
+          contraseña
+        </p>
+        <form (ngSubmit)="onSubmit()">
+          <div class="mb-4 md:mb-6">
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Email</label
+            >
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="email"
+              required
+              email
+              placeholder="Ingresa tu email"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300 mb-4 flex items-center justify-center"
+          >
+            <span *ngIf="!isLoading">Enviar instrucciones</span>
+            <span *ngIf="isLoading" class="flex items-center justify-center">
+              <svg
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Procesando...
+            </span>
+          </button>
+        </form>
+        <p class="mt-4 md:mt-6 text-center text-gray-600">
+          <a routerLink="/login" class="text-blue-600 hover:underline"
+            >Volver a iniciar sesión</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <!-- Right column (Image and info) - Hidden on mobile -->
+    <div
+      class="hidden md:block w-1/2 bg-cover bg-center rounded-l-3xl relative overflow-hidden"
+      style="
+        background-image: url('https://img.freepik.com/fotos-premium/hermosas-banderas-estado-nacional-mexico-estados-unidos-juntos_337817-1462.jpg');
+      "
+    >
+      <div class="absolute inset-0 bg-blue-600 bg-opacity-30"></div>
+      <div
+        class="relative z-10 h-full flex flex-col justify-end p-8 md:p-12 text-white"
+      >
+        <div
+          class="bg-white/20 inline-block px-3 py-1 rounded-full text-sm mb-4"
+        >
+          Recupera tu acceso
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">
+          ¿Olvidaste tu contraseña?
+        </h2>
+        <p class="mb-8">
+          No te preocupes, te enviaremos un enlace a tu correo para que puedas
+          recuperar el acceso a tu cuenta.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  [ngClass]="{
+    'toast fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center': true,
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0 transition-opacity duration-300': isClosing
+  }"
+  class="transition-opacity duration-300"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>
