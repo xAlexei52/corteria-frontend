@@ -14,6 +14,11 @@ import { TrailerEntriesDetailComponent } from './TrailerEntries/trailer-entries-
 import { ManufacturingOrderFormComponent } from './ManufacturintOrders/manufacturing-order-form/manufacturing-order-form.component';
 import { ManufacturingOrdersListComponent } from './ManufacturintOrders/manufacturing-orders-list/manufacturing-orders-list.component';
 import { ManufacturingOrderDetailComponent } from './ManufacturintOrders/manufacturing-order-detail/manufacturing-order-detail.component';
+import { CustomerListComponent } from './Customers/customer-list/customer-list.component';
+import { CustomerFormComponent } from './Customers/customer-form/customer-form.component';
+import { CustomerDetailComponent } from './Customers/customer-detail/customer-detail.component';
+import { CustomerFinancialSummaryComponent } from './Customers/customer-financial-summary/customer-financial-summary.component';
+import { CustomerDebtManagmentComponent } from './Customers/customer-debt-managment/customer-debt-managment.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -44,6 +49,26 @@ const routes: Routes = [
             component: ManufacturingOrderFormComponent,
           },
           { path: 'details/:id', component: ManufacturingOrderDetailComponent },
+        ],
+      },
+      {
+        path: 'clients',
+        children: [
+          { path: 'list', component: CustomerListComponent },
+          { path: 'new', component: CustomerFormComponent },
+          { path: 'edit/:id', component: CustomerFormComponent },
+          { path: 'details/:id', component: CustomerDetailComponent },
+          { path: 'finances', component: CustomerFinancialSummaryComponent },
+          {
+            path: 'financial-summary/:id',
+            component: CustomerFinancialSummaryComponent,
+          },
+          { path: 'debts', component: CustomerDetailComponent },
+          {
+            path: 'debt-management/:id',
+            component: CustomerDebtManagmentComponent,
+          },
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },

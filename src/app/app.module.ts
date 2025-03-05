@@ -21,6 +21,12 @@ import { TrailerEntriesListComponent } from './TrailerEntries/trailer-entries-li
 import { ManufacturingOrderFormComponent } from './ManufacturintOrders/manufacturing-order-form/manufacturing-order-form.component';
 import { ManufacturingOrdersListComponent } from './ManufacturintOrders/manufacturing-orders-list/manufacturing-orders-list.component';
 import { ManufacturingOrderDetailComponent } from './ManufacturintOrders/manufacturing-order-detail/manufacturing-order-detail.component';
+import { CustomerListComponent } from './Customers/customer-list/customer-list.component';
+import { CustomerFormComponent } from './Customers/customer-form/customer-form.component';
+import { CustomerDetailComponent } from './Customers/customer-detail/customer-detail.component';
+import { CustomerFinancialSummaryComponent } from './Customers/customer-financial-summary/customer-financial-summary.component';
+import { CustomerDebtManagmentComponent } from './Customers/customer-debt-managment/customer-debt-managment.component';
+import { CustomerDocumentComponent } from './Customers/customer-document/customer-document.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +44,12 @@ import { ManufacturingOrderDetailComponent } from './ManufacturintOrders/manufac
     ManufacturingOrderFormComponent,
     ManufacturingOrdersListComponent,
     ManufacturingOrderDetailComponent,
+    CustomerListComponent,
+    CustomerFormComponent,
+    CustomerDetailComponent,
+    CustomerFinancialSummaryComponent,
+    CustomerDebtManagmentComponent,
+    CustomerDocumentComponent,
   ],
   imports: [
     BrowserModule,
