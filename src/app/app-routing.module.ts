@@ -8,6 +8,12 @@ import { HomeComponent } from './Home/home/home.component';
 import { RegisterComponent } from './Users/register/register.component';
 import { ResetRequestComponent } from './Users/reset-request/reset-request.component';
 import { ResetPasswordComponent } from './Users/reset-password/reset-password.component';
+import { TrailerEntriesListComponent } from './TrailerEntries/trailer-entries-list/trailer-entries-list.component';
+import { TrailerEntriesFormComponent } from './TrailerEntries/trailer-entries-form/trailer-entries-form.component';
+import { TrailerEntriesDetailComponent } from './TrailerEntries/trailer-entries-detail/trailer-entries-detail.component';
+import { ManufacturingOrderFormComponent } from './ManufacturintOrders/manufacturing-order-form/manufacturing-order-form.component';
+import { ManufacturingOrdersListComponent } from './ManufacturintOrders/manufacturing-orders-list/manufacturing-orders-list.component';
+import { ManufacturingOrderDetailComponent } from './ManufacturintOrders/manufacturing-order-detail/manufacturing-order-detail.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,7 +26,27 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'home', component: HomeComponent },
-      { path: '', redirectTo: 'general', pathMatch: 'full' },
+      {
+        path: 'trailer-entries',
+        children: [
+          { path: '', component: TrailerEntriesListComponent },
+          { path: 'create', component: TrailerEntriesFormComponent },
+          { path: 'edit/:id', component: TrailerEntriesFormComponent },
+          { path: 'details/:id', component: TrailerEntriesDetailComponent },
+        ],
+      },
+      {
+        path: 'manufacturing-orders',
+        children: [
+          { path: '', component: ManufacturingOrdersListComponent },
+          {
+            path: 'create/:trailerEntryId',
+            component: ManufacturingOrderFormComponent,
+          },
+          { path: 'details/:id', component: ManufacturingOrderDetailComponent },
+        ],
+      },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
   { path: '**', redirectTo: 'login', pathMatch: 'full' },

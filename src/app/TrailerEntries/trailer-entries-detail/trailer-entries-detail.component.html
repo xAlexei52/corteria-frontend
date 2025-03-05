@@ -1,0 +1,427 @@
+<!-- trailer-entry-detail.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        Detalles de Entrada de Trailer
+      </h1>
+      <p class="text-gray-600">Información detallada de la entrada</p>
+    </div>
+    <button
+      (click)="goBack()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Información no encontrada -->
+  <div
+    *ngIf="!isLoading && !entry"
+    class="bg-white rounded-xl shadow p-6 text-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-16 w-16 text-gray-400 mx-auto mb-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">
+      Entrada no encontrada
+    </h2>
+    <p class="text-gray-600 mb-4">
+      No se encontró la información de la entrada solicitada.
+    </p>
+    <button
+      (click)="goBack()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+    >
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Detalles de la entrada -->
+  <div
+    *ngIf="!isLoading && entry"
+    class="bg-white rounded-xl shadow overflow-hidden"
+  >
+    <!-- Cabecera con acciones -->
+    <div
+      class="p-6 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center"
+    >
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-1">
+          {{ entry.reference }}
+        </h2>
+        <p class="text-gray-600">
+          {{ entry.date | date : 'dd/MM/yyyy HH:mm' }}
+        </p>
+      </div>
+      <div class="flex mt-4 md:mt-0 space-x-3">
+        <button
+          *ngIf="!entry.has_order"
+          (click)="createManufacturingOrder()"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Crear Orden
+        </button>
+        <button
+          (click)="editEntry()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            />
+          </svg>
+          Editar
+        </button>
+        <button
+          (click)="confirmDelete()"
+          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+
+    <!-- Estado -->
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+      <div class="flex items-center">
+        <div
+          [ngClass]="{
+            'w-3 h-3 rounded-full mr-2': true,
+            'bg-green-500': entry.has_order,
+            'bg-yellow-500': !entry.has_order
+          }"
+        ></div>
+        <span class="font-medium">
+          {{ entry.has_order ? 'Procesado' : 'Pendiente de procesamiento' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Información principal -->
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Producto -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Producto</h3>
+          <p class="text-lg">{{ entry.product?.name || 'Sin producto' }}</p>
+        </div>
+
+        <!-- Proveedor -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Proveedor</h3>
+          <p class="text-lg">{{ entry.supplier }}</p>
+        </div>
+
+        <!-- Ciudad -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Ciudad</h3>
+          <p class="text-lg">{{ entry.city }}</p>
+        </div>
+
+        <!-- Cajas -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Cajas</h3>
+          <p class="text-lg">{{ entry.boxes }}</p>
+        </div>
+
+        <!-- Kilos -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Kilos</h3>
+          <p class="text-lg">{{ entry.kilos }} kg</p>
+        </div>
+
+        <!-- Fecha de Creación -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">
+            Fecha de Registro
+          </h3>
+          <p class="text-lg">
+            {{ entry.createdAt | date : 'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+
+        <!-- Creado por -->
+        <div *ngIf="entry.creator">
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Creado por</h3>
+          <p class="text-lg">
+            {{ entry.creator.firstName }} {{ entry.creator.lastName }}
+          </p>
+        </div>
+
+        <!-- Descripción del producto -->
+        <div
+          *ngIf="entry.product?.description"
+          class="md:col-span-2 lg:col-span-3"
+        >
+          <h3 class="text-sm font-medium text-gray-500 mb-1">
+            Descripción del producto
+          </h3>
+          <p class="text-lg">{{ entry.product.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Órdenes de fabricación relacionadas (si existen) -->
+    <div
+      *ngIf="entry.manufacturingOrders && entry.manufacturingOrders.length > 0"
+      class="p-6 border-t border-gray-200"
+    >
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">
+        Órdenes de Fabricación
+      </h3>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                ID
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Fecha
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Estado
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let order of entry.manufacturingOrders">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ order.id }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ order.createdAt | date : 'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span
+                  [ngClass]="{
+                    'px-2 py-1 rounded-full text-xs': true,
+                    'bg-green-100 text-green-800':
+                      order.status === 'Completado',
+                    'bg-yellow-100 text-yellow-800':
+                      order.status === 'En Proceso',
+                    'bg-blue-100 text-blue-800': order.status === 'Pendiente'
+                  }"
+                >
+                  {{ order.status }}
+                </span>
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              >
+                <a href="#" class="text-blue-600 hover:text-blue-900">Ver</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div
+  *ngIf="showDeleteModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-center text-red-600 mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-12 w-12"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
+      Confirmar Eliminación
+    </h3>
+    <p class="text-gray-600 mb-6 text-center">
+      ¿Estás seguro de que deseas eliminar esta entrada?<br />
+      <span class="font-medium">Esta acción no se puede deshacer.</span>
+    </p>
+    <div class="flex justify-center space-x-4">
+      <button
+        (click)="cancelDelete()"
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="deleteEntry()"
+        [disabled]="isLoading"
+        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+      >
+        <span *ngIf="!isLoading">Eliminar</span>
+        <span *ngIf="isLoading" class="flex items-center">
+          <svg
+            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Procesando...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  [ngClass]="{
+    'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md': true,
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0 transition-opacity duration-300': isClosing
+  }"
+  class="transition-opacity duration-300"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

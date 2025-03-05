@@ -15,6 +15,12 @@ import { ResetPasswordComponent } from './Users/reset-password/reset-password.co
 import { SidebarComponent } from './Layout/Sidebar/sidebar/sidebar.component';
 import { DashboardLayoutComponent } from './Layout/Dashboard/dashboard-layout/dashboard-layout.component';
 import { HomeComponent } from './Home/home/home.component';
+import { TrailerEntriesDetailComponent } from './TrailerEntries/trailer-entries-detail/trailer-entries-detail.component';
+import { TrailerEntriesFormComponent } from './TrailerEntries/trailer-entries-form/trailer-entries-form.component';
+import { TrailerEntriesListComponent } from './TrailerEntries/trailer-entries-list/trailer-entries-list.component';
+import { ManufacturingOrderFormComponent } from './ManufacturintOrders/manufacturing-order-form/manufacturing-order-form.component';
+import { ManufacturingOrdersListComponent } from './ManufacturintOrders/manufacturing-orders-list/manufacturing-orders-list.component';
+import { ManufacturingOrderDetailComponent } from './ManufacturintOrders/manufacturing-order-detail/manufacturing-order-detail.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +31,13 @@ import { HomeComponent } from './Home/home/home.component';
     ResetPasswordComponent,
     SidebarComponent,
     DashboardLayoutComponent,
-    HomeComponent
+    HomeComponent,
+    TrailerEntriesDetailComponent,
+    TrailerEntriesFormComponent,
+    TrailerEntriesListComponent,
+    ManufacturingOrderFormComponent,
+    ManufacturingOrdersListComponent,
+    ManufacturingOrderDetailComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,15 +45,15 @@ import { HomeComponent } from './Home/home/home.component';
     HttpClientModule,
     CommonModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

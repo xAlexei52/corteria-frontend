@@ -1,0 +1,309 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{
+          isEditMode ? 'Editar Entrada de Trailer' : 'Nueva Entrada de Trailer'
+        }}
+      </h1>
+      <p class="text-gray-600">
+        {{
+          isEditMode
+            ? 'Actualiza la información de la entrada'
+            : 'Registra una nueva entrada de trailer'
+        }}
+      </p>
+    </div>
+    <button
+      (click)="cancel()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Formulario principal -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
+      <!-- Cargando -->
+      <div *ngIf="isLoading" class="flex justify-center mb-4">
+        <svg
+          class="animate-spin h-6 w-6 text-blue-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Fecha -->
+        <div>
+          <label for="date" class="block text-sm font-medium text-gray-700 mb-1"
+            >Fecha y Hora <span class="text-red-500">*</span></label
+          >
+          <input
+            type="datetime-local"
+            id="date"
+            formControlName="date"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('date') }"
+          />
+          <p *ngIf="isFieldInvalid('date')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('date') }}
+          </p>
+        </div>
+
+        <!-- Producto -->
+        <div>
+          <label
+            for="productId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Producto <span class="text-red-500">*</span></label
+          >
+          <select
+            id="productId"
+            formControlName="productId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('productId') }"
+          >
+            <option value="">Selecciona un producto</option>
+            <option *ngFor="let product of products" [value]="product.id">
+              {{ product.name }}
+            </option>
+          </select>
+          <p
+            *ngIf="isFieldInvalid('productId')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('productId') }}
+          </p>
+        </div>
+
+        <!-- Proveedor -->
+        <div>
+          <label
+            for="supplier"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Proveedor <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="supplier"
+            formControlName="supplier"
+            placeholder="Nombre del proveedor"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('supplier') }"
+          />
+          <p
+            *ngIf="isFieldInvalid('supplier')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('supplier') }}
+          </p>
+        </div>
+
+        <!-- Ciudad -->
+        <div>
+          <label for="city" class="block text-sm font-medium text-gray-700 mb-1"
+            >Ciudad <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="city"
+            formControlName="city"
+            placeholder="Ciudad de recepción"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('city') }"
+          />
+          <p *ngIf="isFieldInvalid('city')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('city') }}
+          </p>
+        </div>
+
+        <!-- Referencia -->
+        <div>
+          <label
+            for="reference"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Referencia <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="reference"
+            formControlName="reference"
+            placeholder="Ej. Lote #12345"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('reference') }"
+          />
+          <p
+            *ngIf="isFieldInvalid('reference')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('reference') }}
+          </p>
+        </div>
+
+        <!-- Cajas -->
+        <div>
+          <label
+            for="boxes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Cantidad de Cajas <span class="text-red-500">*</span></label
+          >
+          <input
+            type="number"
+            id="boxes"
+            formControlName="boxes"
+            placeholder="Cantidad de cajas"
+            min="1"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('boxes') }"
+          />
+          <p *ngIf="isFieldInvalid('boxes')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('boxes') }}
+          </p>
+        </div>
+
+        <!-- Kilos -->
+        <div>
+          <label
+            for="kilos"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Kilos <span class="text-red-500">*</span></label
+          >
+          <input
+            type="number"
+            id="kilos"
+            formControlName="kilos"
+            placeholder="Cantidad en kilos"
+            min="0.1"
+            step="0.1"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('kilos') }"
+          />
+          <p *ngIf="isFieldInvalid('kilos')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('kilos') }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="entryForm.invalid || isLoading"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{
+            'opacity-50 cursor-not-allowed': entryForm.invalid || isLoading
+          }"
+        >
+          <span *ngIf="!isLoading">{{
+            isEditMode ? 'Actualizar' : 'Guardar'
+          }}</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  [ngClass]="{
+    'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md': true,
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0 transition-opacity duration-300': isClosing
+  }"
+  class="transition-opacity duration-300"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>
