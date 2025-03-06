@@ -19,6 +19,10 @@ import { CustomerFormComponent } from './Customers/customer-form/customer-form.c
 import { CustomerDetailComponent } from './Customers/customer-detail/customer-detail.component';
 import { CustomerFinancialSummaryComponent } from './Customers/customer-financial-summary/customer-financial-summary.component';
 import { CustomerDebtManagmentComponent } from './Customers/customer-debt-managment/customer-debt-managment.component';
+import { SaleListComponent } from './Sales/sale-list/sale-list.component';
+import { SaleFormComponent } from './Sales/sale-form/sale-form.component';
+import { SaleDetailComponent } from './Sales/sale-detail/sale-detail.component';
+import { SalePaymentComponent } from './Sales/sale-payment/sale-payment.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -68,6 +72,17 @@ const routes: Routes = [
             path: 'debt-management/:id',
             component: CustomerDebtManagmentComponent,
           },
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+        ],
+      },
+      {
+        path: 'sales',
+        children: [
+          { path: 'list', component: SaleListComponent },
+          { path: 'new', component: SaleFormComponent },
+          { path: 'edit/:id', component: SaleFormComponent },
+          { path: 'details/:id', component: SaleDetailComponent },
+          { path: 'payment/:id', component: SalePaymentComponent },
           { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },

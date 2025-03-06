@@ -27,6 +27,10 @@ import { CustomerDetailComponent } from './Customers/customer-detail/customer-de
 import { CustomerFinancialSummaryComponent } from './Customers/customer-financial-summary/customer-financial-summary.component';
 import { CustomerDebtManagmentComponent } from './Customers/customer-debt-managment/customer-debt-managment.component';
 import { CustomerDocumentComponent } from './Customers/customer-document/customer-document.component';
+import { SaleListComponent } from './Sales/sale-list/sale-list.component';
+import { SaleFormComponent } from './Sales/sale-form/sale-form.component';
+import { SaleDetailComponent } from './Sales/sale-detail/sale-detail.component';
+import { SalePaymentComponent } from './Sales/sale-payment/sale-payment.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +54,10 @@ import { CustomerDocumentComponent } from './Customers/customer-document/custome
     CustomerFinancialSummaryComponent,
     CustomerDebtManagmentComponent,
     CustomerDocumentComponent,
+    SaleListComponent,
+    SaleFormComponent,
+    SaleDetailComponent,
+    SalePaymentComponent,
   ],
   imports: [
     BrowserModule,
