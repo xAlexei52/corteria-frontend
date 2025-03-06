@@ -1,15 +1,14 @@
+<!-- supply-list.component.html -->
 <div class="p-6 bg-gray-100 min-h-screen">
   <div
     class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
   >
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">Entradas de Trailer</h1>
-      <p class="text-gray-600">
-        Gestiona las entradas de trailer y su procesamiento
-      </p>
+      <h1 class="text-2xl font-bold text-gray-800">Insumos</h1>
+      <p class="text-gray-600">Gestiona los insumos para tus productos</p>
     </div>
     <button
-      (click)="createNewEntry()"
+      (click)="createNewSupply()"
       class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-700 transition-colors"
     >
       <svg
@@ -24,7 +23,7 @@
           clip-rule="evenodd"
         />
       </svg>
-      Nueva Entrada
+      Nuevo Insumo
     </button>
   </div>
 
@@ -32,58 +31,36 @@
   <div class="bg-white rounded-xl shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4">Filtros</h2>
     <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label
-            for="startDate"
+            for="search"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Fecha Inicial</label
-          >
-          <input
-            type="date"
-            id="startDate"
-            formControlName="startDate"
-            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label
-            for="endDate"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Fecha Final</label
-          >
-          <input
-            type="date"
-            id="endDate"
-            formControlName="endDate"
-            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label for="city" class="block text-sm font-medium text-gray-700 mb-1"
-            >Ciudad</label
+            >Buscar</label
           >
           <input
             type="text"
-            id="city"
-            formControlName="city"
-            placeholder="Filtrar por ciudad"
+            id="search"
+            formControlName="search"
+            placeholder="Nombre, descripción..."
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div>
           <label
-            for="supplier"
+            for="active"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Proveedor</label
+            >Estado</label
           >
-          <input
-            type="text"
-            id="supplier"
-            formControlName="supplier"
-            placeholder="Filtrar por proveedor"
+          <select
+            id="active"
+            formControlName="active"
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          >
+            <option value="">Todos</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
         </div>
       </div>
       <div class="flex justify-end mt-4 space-x-3">
@@ -104,7 +81,7 @@
     </form>
   </div>
 
-  <!-- Tabla de entradas -->
+  <!-- Tabla de insumos -->
   <div class="bg-white rounded-xl shadow overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
@@ -114,43 +91,25 @@
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Fecha
+              Nombre
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Referencia
+              Descripción
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Proveedor
+              Unidad
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Producto
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Ciudad
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Cajas
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Kilos
+              Costo/Unidad
             </th>
             <th
               scope="col"
@@ -169,7 +128,7 @@
         <tbody class="bg-white divide-y divide-gray-200">
           <!-- Estado de carga -->
           <tr *ngIf="isLoading">
-            <td colspan="9" class="px-6 py-4 text-center">
+            <td colspan="6" class="px-6 py-4 text-center">
               <div class="flex justify-center">
                 <svg
                   class="animate-spin h-6 w-6 text-blue-500"
@@ -196,44 +155,40 @@
           </tr>
 
           <!-- Sin resultados -->
-          <tr *ngIf="!isLoading && entries.length === 0">
-            <td colspan="9" class="px-6 py-4 text-center text-gray-500">
-              No se encontraron entradas con los filtros seleccionados.
+          <tr *ngIf="!isLoading && supplies.length === 0">
+            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+              No se encontraron insumos con los filtros seleccionados.
             </td>
           </tr>
 
-          <!-- Lista de entradas -->
-          <tr *ngFor="let entry of entries" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.date | date : 'dd/MM/yyyy HH:mm' }}
+          <!-- Lista de insumos -->
+          <tr *ngFor="let supply of supplies" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ supply.name }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                {{ supply.description || 'Sin descripción' }}
+              </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.reference }}
+              {{ supply.unit }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.supplier }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.product?.name || 'Sin producto' }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.city }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.boxes }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ entry.kilos }} kg
+              ${{ supply.costPerUnit }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
               <span
-                [ngClass]="{
-                  'px-2 py-1 rounded-full text-xs': true,
-                  'bg-green-100 text-green-800': entry.hasOrder,
-                  'bg-yellow-100 text-yellow-800': !entry.hasOrder
-                }"
+                class="px-2 py-1 rounded-full text-xs"
+                [ngClass]="
+                  supply.active
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                "
               >
-                {{ entry.hasOrder ? 'Procesado' : 'Pendiente' }}
+                {{ supply.active ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
             <td
@@ -241,7 +196,7 @@
             >
               <div class="flex justify-end space-x-2">
                 <button
-                  (click)="viewDetails(entry.id)"
+                  (click)="viewSupplyDetails(supply.id)"
                   class="text-blue-600 hover:text-blue-900"
                   title="Ver detalles"
                 >
@@ -260,7 +215,7 @@
                   </svg>
                 </button>
                 <button
-                  (click)="editEntry(entry.id)"
+                  (click)="editSupply(supply.id)"
                   class="text-indigo-600 hover:text-indigo-900"
                   title="Editar"
                 >
@@ -276,7 +231,7 @@
                   </svg>
                 </button>
                 <button
-                  (click)="confirmDelete(entry)"
+                  (click)="deleteSupply(supply.id)"
                   class="text-red-600 hover:text-red-900"
                   title="Eliminar"
                 >
@@ -308,7 +263,7 @@
         <button
           [disabled]="currentPage === 1"
           (click)="onPageChange(currentPage - 1)"
-          [ngClass]="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
+          [ngClass]="currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''"
           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           Anterior
@@ -316,9 +271,9 @@
         <button
           [disabled]="currentPage === totalPages"
           (click)="onPageChange(currentPage + 1)"
-          [ngClass]="{
-            'cursor-not-allowed opacity-50': currentPage === totalPages
-          }"
+          [ngClass]="
+            currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''
+          "
           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           Siguiente
@@ -349,7 +304,7 @@
             <button
               [disabled]="currentPage === 1"
               (click)="onPageChange(1)"
-              [ngClass]="{ 'cursor-not-allowed': currentPage === 1 }"
+              [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Inicio</span>
@@ -369,7 +324,7 @@
             <button
               [disabled]="currentPage === 1"
               (click)="onPageChange(currentPage - 1)"
-              [ngClass]="{ 'cursor-not-allowed': currentPage === 1 }"
+              [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Anterior</span>
@@ -393,13 +348,12 @@
             >
               <button
                 (click)="onPageChange(i + 1)"
-                [ngClass]="{
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium': true,
-                  'bg-blue-50 border-blue-500 text-blue-600':
-                    currentPage === i + 1,
-                  'bg-white border-gray-300 text-gray-700 hover:bg-gray-50':
-                    currentPage !== i + 1
-                }"
+                class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                [ngClass]="
+                  currentPage === i + 1
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                "
               >
                 {{ i + 1 }}
               </button>
@@ -408,7 +362,7 @@
             <button
               [disabled]="currentPage === totalPages"
               (click)="onPageChange(currentPage + 1)"
-              [ngClass]="{ 'cursor-not-allowed': currentPage === totalPages }"
+              [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Siguiente</span>
@@ -428,7 +382,7 @@
             <button
               [disabled]="currentPage === totalPages"
               (click)="onPageChange(totalPages)"
-              [ngClass]="{ 'cursor-not-allowed': currentPage === totalPages }"
+              [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Fin</span>
@@ -457,84 +411,15 @@
   </div>
 </div>
 
-<!-- Modal de confirmación de eliminación -->
-<div
-  *ngIf="showDeleteModal"
-  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
->
-  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-    <div class="flex items-center justify-center text-red-600 mb-4">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-12 w-12"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    </div>
-    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
-      Confirmar Eliminación
-    </h3>
-    <p class="text-gray-600 mb-6 text-center">
-      ¿Estás seguro de que deseas eliminar esta entrada?<br />
-      <span class="font-medium">Esta acción no se puede deshacer.</span>
-    </p>
-    <div class="flex justify-center space-x-4">
-      <button
-        (click)="cancelDelete()"
-        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-      >
-        Cancelar
-      </button>
-      <button
-        (click)="deleteEntry()"
-        [disabled]="isLoading"
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
-      >
-        <span *ngIf="!isLoading">Eliminar</span>
-        <span *ngIf="isLoading" class="flex items-center">
-          <svg
-            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          Procesando...
-        </span>
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- Alerta de notificación -->
 <div
   *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
   [ngClass]="{
-    'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md': true,
     'bg-green-600': isSuccess,
     'bg-red-600': !isSuccess,
-    'opacity-0 transition-opacity duration-300': isClosing
+    'opacity-0': isClosing
   }"
-  class="transition-opacity duration-300"
 >
   <svg
     *ngIf="isSuccess"

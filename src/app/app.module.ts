@@ -31,6 +31,18 @@ import { SaleListComponent } from './Sales/sale-list/sale-list.component';
 import { SaleFormComponent } from './Sales/sale-form/sale-form.component';
 import { SaleDetailComponent } from './Sales/sale-detail/sale-detail.component';
 import { SalePaymentComponent } from './Sales/sale-payment/sale-payment.component';
+import { ProductListComponent } from './Proeducts/product-list/product-list.component';
+import { ProductFormComponent } from './Proeducts/product-form/product-form.component';
+import { ProductDetailComponent } from './Proeducts/product-detail/product-detail.component';
+import { SupplyListComponent } from './Supplies/supply-list/supply-list.component';
+import { SupplyFormComponent } from './Supplies/supply-form/supply-form.component';
+import { SupplyDetailComponent } from './Supplies/supply-detail/supply-detail.component';
+import { RecipeListComponent } from './Recipes/recipe-list/recipe-list.component';
+import { RecipeFormComponent } from './Recipes/recipe-form/recipe-form.component';
+import { RecipeDetailComponent } from './Recipes/recipe-detail/recipe-detail.component';
+import { UserListComponent } from './Users/user-list/user-list.component';
+import { UserDetailComponent } from './Users/user-detail/user-detail.component';
+import { UserEditComponent } from './Users/user-edit/user-edit.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +70,18 @@ import { SalePaymentComponent } from './Sales/sale-payment/sale-payment.componen
     SaleFormComponent,
     SaleDetailComponent,
     SalePaymentComponent,
+    ProductListComponent,
+    ProductFormComponent,
+    ProductDetailComponent,
+    SupplyListComponent,
+    SupplyFormComponent,
+    SupplyDetailComponent,
+    RecipeListComponent,
+    RecipeFormComponent,
+    RecipeDetailComponent,
+    UserListComponent,
+    UserDetailComponent,
+    UserEditComponent,
   ],
   imports: [
     BrowserModule,

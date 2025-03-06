@@ -1,0 +1,301 @@
+<!-- user-detail.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Encabezado y navegación -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Detalles del Usuario</h1>
+      <p class="text-gray-600">Información detallada y gestión de permisos</p>
+    </div>
+    <button
+      (click)="goBack()"
+      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Contenido principal cuando no está cargando -->
+  <div *ngIf="!isLoading && user" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Información del usuario -->
+    <div class="md:col-span-2">
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex items-center mb-6">
+          <div
+            class="h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold mr-4"
+          >
+            {{ user.firstName ? user.firstName.charAt(0) : ''
+            }}{{ user.lastName ? user.lastName.charAt(0) : '' }}
+          </div>
+          <div>
+            <h2 class="text-xl font-semibold text-gray-800">
+              {{ getFullName() }}
+            </h2>
+            <p class="text-gray-600">{{ user.email }}</p>
+            <div class="mt-1">
+              <span
+                class="px-2 py-1 rounded-full text-xs"
+                [ngClass]="
+                  user.active
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                "
+              >
+                {{ user.active ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4">
+          <h3 class="text-lg font-medium text-gray-800 mb-4">
+            Información General
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500">Nombre Completo</p>
+              <p class="font-medium">{{ getFullName() }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Correo Electrónico</p>
+              <p class="font-medium">{{ user.email }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Rol</p>
+              <p class="font-medium">{{ formatRole(user.role) }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Ciudad asignada</p>
+              <p class="font-medium">{{ user.city || 'No asignada' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Fecha de registro</p>
+              <p class="font-medium">{{ formatDate(user.createdAt) }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Último acceso</p>
+              <p class="font-medium">
+                {{ user.lastLogin ? formatDate(user.lastLogin) : 'Nunca' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            (click)="toggleUserActive()"
+            class="px-4 py-2 rounded-md flex items-center transition-colors"
+            [ngClass]="
+              user.active
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            "
+            [disabled]="isUpdating"
+          >
+            <svg
+              *ngIf="user.active"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <svg
+              *ngIf="!user.active"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            {{ user.active ? 'Desactivar usuario' : 'Activar usuario' }}
+          </button>
+
+          <button
+            (click)="editUser()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+              />
+            </svg>
+            Editar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de gestión de permisos -->
+    <div>
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-medium text-gray-800 mb-4">
+          Gestión de Permisos
+        </h3>
+
+        <form [formGroup]="permissionsForm" (ngSubmit)="updatePermissions()">
+          <div class="mb-4">
+            <label
+              for="role"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Rol</label
+            >
+            <select
+              id="role"
+              formControlName="role"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option *ngFor="let role of roleOptions" [value]="role.value">
+                {{ role.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-6">
+            <label
+              for="city"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Ciudad Asignada</label
+            >
+            <select
+              id="city"
+              formControlName="city"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Sin asignar</option>
+              <option *ngFor="let city of cityOptions" [value]="city.value">
+                {{ city.label }}
+              </option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white rounded-md py-2 px-4 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            [disabled]="isUpdating || permissionsForm.invalid"
+          >
+            <span *ngIf="isUpdating">
+              <svg
+                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Actualizando...
+            </span>
+            <span *ngIf="!isUpdating">Actualizar permisos</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>
