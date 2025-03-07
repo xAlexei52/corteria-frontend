@@ -35,6 +35,9 @@ import { RecipeDetailComponent } from './Recipes/recipe-detail/recipe-detail.com
 import { UserListComponent } from './Users/user-list/user-list.component';
 import { UserDetailComponent } from './Users/user-detail/user-detail.component';
 import { UserEditComponent } from './Users/user-edit/user-edit.component';
+import { FixedExpenseListComponent } from './FixedExpenses/fixed-expense-list/fixed-expense-list.component';
+import { FixedExpenseFormComponent } from './FixedExpenses/fixed-expense-form/fixed-expense-form.component';
+import { FixedExpenseDetailComponent } from './FixedExpenses/fixed-expense-detail/fixed-expense-detail.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -134,6 +137,16 @@ const routes: Routes = [
           { path: 'list', component: UserListComponent },
           { path: 'details/:id', component: UserDetailComponent },
           { path: 'edit/:id', component: UserEditComponent },
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+        ],
+      },
+      {
+        path: 'fixed-expenses',
+        children: [
+          { path: 'list', component: FixedExpenseListComponent },
+          { path: 'new', component: FixedExpenseFormComponent },
+          { path: 'edit/:id', component: FixedExpenseFormComponent },
+          { path: 'details/:id', component: FixedExpenseDetailComponent },
           { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },

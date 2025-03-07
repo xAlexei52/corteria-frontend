@@ -43,6 +43,9 @@ import { RecipeDetailComponent } from './Recipes/recipe-detail/recipe-detail.com
 import { UserListComponent } from './Users/user-list/user-list.component';
 import { UserDetailComponent } from './Users/user-detail/user-detail.component';
 import { UserEditComponent } from './Users/user-edit/user-edit.component';
+import { FixedExpenseListComponent } from './FixedExpenses/fixed-expense-list/fixed-expense-list.component';
+import { FixedExpenseFormComponent } from './FixedExpenses/fixed-expense-form/fixed-expense-form.component';
+import { FixedExpenseDetailComponent } from './FixedExpenses/fixed-expense-detail/fixed-expense-detail.component';
 
 @NgModule({
   declarations: [
@@ -82,6 +85,9 @@ import { UserEditComponent } from './Users/user-edit/user-edit.component';
     UserListComponent,
     UserDetailComponent,
     UserEditComponent,
+    FixedExpenseListComponent,
+    FixedExpenseFormComponent,
+    FixedExpenseDetailComponent,
   ],
   imports: [
     BrowserModule,
