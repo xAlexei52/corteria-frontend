@@ -1,4 +1,4 @@
-<div class="relative h-screen">
+<div class="relative h-screen overflow-auto">
   <aside
     [ngClass]="{
       'translate-x-0': isSidebarOpen,
@@ -175,8 +175,48 @@
           <i class="material-icons-outlined mr-3">currency_exchange</i>
           Gastos Fijos
         </a>
+        <div class="my-3 border-t border-gray-200"></div>
+        <p class="text-xs font-semibold text-gray-600 mb-2 mt-4">PROYECTOS</p>
+        <!-- Insumos y Recetas con submenú -->
+        <div class="sidebar-item">
+          <button
+            (click)="toggleProyectos()"
+            class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+            [ngClass]="{ 'bg-blue-100 text-blue-600': isProyectosExpanded }"
+          >
+            <div class="flex items-center">
+              <i class="material-icons-outlined mr-3">business_center</i>
+              Proyectos
+            </div>
+            <i
+              class="material-icons-outlined"
+              [ngClass]="{ 'rotate-180': isProyectosExpanded }"
+              >expand_more</i
+            >
+          </button>
+
+          <div *ngIf="isProyectosExpanded" class="pl-6 mt-2 space-y-2">
+            <a
+              routerLink="projects/list"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">list</i>
+              Listado
+            </a>
+            <a
+              routerLink="projects/new"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">add_business</i>
+              Nuevo Proyecto
+            </a>
+          </div>
+        </div>
       </nav>
     </div>
+    <div class="my-3 border-t border-gray-200"></div>
 
     <div class="p-4">
       <button

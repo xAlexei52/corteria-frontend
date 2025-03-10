@@ -46,6 +46,14 @@ import { UserEditComponent } from './Users/user-edit/user-edit.component';
 import { FixedExpenseListComponent } from './FixedExpenses/fixed-expense-list/fixed-expense-list.component';
 import { FixedExpenseFormComponent } from './FixedExpenses/fixed-expense-form/fixed-expense-form.component';
 import { FixedExpenseDetailComponent } from './FixedExpenses/fixed-expense-detail/fixed-expense-detail.component';
+import { ProjectListComponent } from './Projects/project-list/project-list.component';
+import { ProjectFormComponent } from './Projects/project-form/project-form.component';
+import { ProjectDetailComponent } from './Projects/project-detail/project-detail.component';
+import { ProjectFinancialComponent } from './Projects/project-financial/project-financial.component';
+import { ProjectExpenseListComponent } from './Projects/project-expense-list/project-expense-list.component';
+import { ProjectExpenseFormComponent } from './Projects/project-expense-form/project-expense-form.component';
+import { ProjectIncomeListComponent } from './Projects/project-income-list/project-income-list.component';
+import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +96,14 @@ import { FixedExpenseDetailComponent } from './FixedExpenses/fixed-expense-detai
     FixedExpenseListComponent,
     FixedExpenseFormComponent,
     FixedExpenseDetailComponent,
+    ProjectListComponent,
+    ProjectFormComponent,
+    ProjectDetailComponent,
+    ProjectFinancialComponent,
+    ProjectExpenseListComponent,
+    ProjectExpenseFormComponent,
+    ProjectIncomeListComponent,
+    ProjectIncomeFormComponent,
   ],
   imports: [
     BrowserModule,

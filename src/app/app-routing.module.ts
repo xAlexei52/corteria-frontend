@@ -38,6 +38,14 @@ import { UserEditComponent } from './Users/user-edit/user-edit.component';
 import { FixedExpenseListComponent } from './FixedExpenses/fixed-expense-list/fixed-expense-list.component';
 import { FixedExpenseFormComponent } from './FixedExpenses/fixed-expense-form/fixed-expense-form.component';
 import { FixedExpenseDetailComponent } from './FixedExpenses/fixed-expense-detail/fixed-expense-detail.component';
+import { ProjectListComponent } from './Projects/project-list/project-list.component';
+import { ProjectFormComponent } from './Projects/project-form/project-form.component';
+import { ProjectDetailComponent } from './Projects/project-detail/project-detail.component';
+import { ProjectFinancialComponent } from './Projects/project-financial/project-financial.component';
+import { ProjectExpenseListComponent } from './Projects/project-expense-list/project-expense-list.component';
+import { ProjectExpenseFormComponent } from './Projects/project-expense-form/project-expense-form.component';
+import { ProjectIncomeListComponent } from './Projects/project-income-list/project-income-list.component';
+import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -147,6 +155,33 @@ const routes: Routes = [
           { path: 'new', component: FixedExpenseFormComponent },
           { path: 'edit/:id', component: FixedExpenseFormComponent },
           { path: 'details/:id', component: FixedExpenseDetailComponent },
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+        ],
+      },
+      {
+        path: 'projects',
+        canActivate: [AuthGuard],
+        children: [
+          { path: 'list', component: ProjectListComponent },
+          { path: 'new', component: ProjectFormComponent },
+          { path: 'edit/:id', component: ProjectFormComponent },
+          { path: 'details/:id', component: ProjectDetailComponent },
+          { path: 'financial/:id', component: ProjectFinancialComponent },
+          {
+            path: 'expenses/:projectId',
+            component: ProjectExpenseListComponent,
+          },
+          {
+            path: 'expenses/new/:projectId',
+            component: ProjectExpenseFormComponent,
+          },
+          { path: 'expenses/edit/:id', component: ProjectExpenseFormComponent },
+          { path: 'incomes/:projectId', component: ProjectIncomeListComponent },
+          {
+            path: 'incomes/new/:projectId',
+            component: ProjectIncomeFormComponent,
+          },
+          { path: 'incomes/edit/:id', component: ProjectIncomeFormComponent },
           { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },

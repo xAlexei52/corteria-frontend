@@ -5,7 +5,7 @@ import { UsersService } from 'src/app/_services/Users/users.service';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
+  styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent {
   @Input() isSidebarOpen = false;
@@ -14,6 +14,7 @@ export class SidebarComponent {
   isInventarioExpanded: boolean = false;
   isClientesExpanded: boolean = false;
   isInsumosExpanded: boolean = false;
+  isProyectosExpanded: boolean = false;
 
   constructor(private usersService: UsersService, private router: Router) {}
 
@@ -36,5 +37,9 @@ export class SidebarComponent {
   logout() {
     this.usersService.logout(); // Esto debería limpiar el token y otros datos de sesión
     this.router.navigate(['/login']); // Redirige al usuario a la página de login
+  }
+
+  toggleProyectos() {
+    this.isProyectosExpanded = !this.isProyectosExpanded;
   }
 }

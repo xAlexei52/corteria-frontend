@@ -1,0 +1,215 @@
+<!-- src/app/modules/projects/pages/project-income-form/project-income-form.component.html -->
+<div class="w-full h-full">
+  <div class="h-auto flex flex-col w-full px-4 md:px-6">
+    <!-- Encabezado -->
+    <div class="flex items-center mb-6 w-full">
+      <button
+        (click)="onCancel()"
+        class="mr-4 p-2 text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        <i class="material-icons-outlined">arrow_back</i>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{ isEditMode ? 'Editar Ingreso' : 'Nuevo Ingreso' }}
+      </h1>
+    </div>
+
+    <!-- Estado de carga -->
+    <div
+      *ngIf="loading"
+      class="bg-white rounded-lg shadow-md p-6 text-center flex-grow flex items-center justify-center w-full"
+    >
+      <div>
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"
+        ></div>
+        <p class="mt-2 text-gray-600">Cargando información...</p>
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div
+      *ngIf="error"
+      class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded w-full"
+    >
+      <p class="font-bold">Error</p>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Información del proyecto -->
+    <div *ngIf="project && !loading" class="mb-6 bg-gray-50 p-4 rounded-lg">
+      <h2 class="text-lg font-semibold text-gray-800">
+        Proyecto: {{ project.name }}
+      </h2>
+    </div>
+
+    <!-- Formulario -->
+    <form
+      *ngIf="!loading"
+      [formGroup]="incomeForm"
+      (ngSubmit)="onSubmit()"
+      class="bg-white rounded-lg shadow-md p-6 flex-grow flex flex-col w-full"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow w-full">
+        <!-- Descripción (span 2 columnas) -->
+        <div class="md:col-span-2">
+          <label
+            for="description"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Descripción <span class="text-red-600">*</span>
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                incomeForm.get('description')?.invalid &&
+                incomeForm.get('description')?.touched
+            }"
+          ></textarea>
+          <div
+            *ngIf="
+              incomeForm.get('description')?.invalid &&
+              incomeForm.get('description')?.touched
+            "
+            class="text-sm text-red-600 mt-1"
+          >
+            <span *ngIf="incomeForm.get('description')?.errors?.['required']">
+              La descripción es requerida.
+            </span>
+            <span *ngIf="incomeForm.get('description')?.errors?.['maxlength']">
+              La descripción no puede exceder 200 caracteres.
+            </span>
+          </div>
+        </div>
+
+        <!-- Monto -->
+        <div>
+          <label
+            for="amount"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Monto <span class="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="amount"
+            formControlName="amount"
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                incomeForm.get('amount')?.invalid &&
+                incomeForm.get('amount')?.touched
+            }"
+            step="0.01"
+            min="0.01"
+          />
+          <div
+            *ngIf="
+              incomeForm.get('amount')?.invalid &&
+              incomeForm.get('amount')?.touched
+            "
+            class="text-sm text-red-600 mt-1"
+          >
+            <span *ngIf="incomeForm.get('amount')?.errors?.['required']">
+              El monto es requerido.
+            </span>
+            <span *ngIf="incomeForm.get('amount')?.errors?.['min']">
+              El monto debe ser mayor a cero.
+            </span>
+          </div>
+        </div>
+
+        <!-- Fecha -->
+        <div>
+          <label
+            for="date"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Fecha <span class="text-red-600">*</span>
+          </label>
+          <input
+            type="date"
+            id="date"
+            formControlName="date"
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                incomeForm.get('date')?.invalid &&
+                incomeForm.get('date')?.touched
+            }"
+          />
+          <div
+            *ngIf="
+              incomeForm.get('date')?.invalid && incomeForm.get('date')?.touched
+            "
+            class="text-sm text-red-600 mt-1"
+          >
+            <span *ngIf="incomeForm.get('date')?.errors?.['required']">
+              La fecha es requerida.
+            </span>
+          </div>
+        </div>
+
+        <!-- Categoría -->
+        <div>
+          <label
+            for="category"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Categoría
+          </label>
+          <input
+            type="text"
+            id="category"
+            formControlName="category"
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Notas -->
+        <div class="md:col-span-2">
+          <label
+            for="notes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Notas adicionales
+          </label>
+          <textarea
+            id="notes"
+            formControlName="notes"
+            rows="3"
+            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div
+        class="flex flex-col md:flex-row md:justify-end md:space-x-4 mt-6 space-y-3 md:space-y-0 w-full"
+      >
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors w-full md:w-auto"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center w-full md:w-auto"
+          [disabled]="submitting"
+        >
+          <div
+            *ngIf="submitting"
+            class="animate-spin h-4 w-4 mr-2 border-t-2 border-l-2 border-white rounded-full"
+          ></div>
+          {{ isEditMode ? 'Actualizar' : 'Registrar' }} Ingreso
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
