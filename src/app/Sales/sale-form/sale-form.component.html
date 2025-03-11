@@ -1,0 +1,425 @@
+<!-- sale-form.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{ isEditMode ? 'Editar Venta' : 'Nueva Venta' }}
+      </h1>
+      <p class="text-gray-600">
+        {{
+          isEditMode
+            ? 'Modifica los detalles de la venta'
+            : 'Registra una nueva venta de productos'
+        }}
+      </p>
+    </div>
+    <button
+      (click)="goBack()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Formulario de venta -->
+  <div *ngIf="!isLoading" class="space-y-6">
+    <form [formGroup]="saleForm" (ngSubmit)="onSubmit()">
+      <!-- Información básica -->
+      <div class="bg-white rounded-xl shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Información Básica
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="customerId"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Cliente <span class="text-red-600">*</span>
+            </label>
+            <select
+              id="customerId"
+              formControlName="customerId"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [ngClass]="{
+                'border-red-500':
+                  saleForm.get('customerId')?.invalid &&
+                  saleForm.get('customerId')?.touched
+              }"
+            >
+              <option value="">Seleccionar cliente</option>
+              <option *ngFor="let customer of customers" [value]="customer.id">
+                {{ customer.firstName }} {{ customer.lastName }}
+              </option>
+            </select>
+            <div
+              *ngIf="
+                saleForm.get('customerId')?.invalid &&
+                saleForm.get('customerId')?.touched
+              "
+              class="text-red-500 text-sm mt-1"
+            >
+              Cliente requerido
+            </div>
+          </div>
+          <div>
+            <label
+              for="date"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Fecha y Hora <span class="text-red-600">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              id="date"
+              formControlName="date"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [ngClass]="{
+                'border-red-500':
+                  saleForm.get('date')?.invalid && saleForm.get('date')?.touched
+              }"
+            />
+            <div
+              *ngIf="
+                saleForm.get('date')?.invalid && saleForm.get('date')?.touched
+              "
+              class="text-red-500 text-sm mt-1"
+            >
+              Fecha requerida
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <label
+              for="notes"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Notas
+            </label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              rows="3"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Información adicional sobre la venta..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos -->
+      <div class="bg-white rounded-xl shadow p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">Productos</h2>
+          <button
+            type="button"
+            (click)="addProduct()"
+            class="bg-blue-600 text-white px-3 py-1 rounded-md flex items-center hover:bg-blue-700 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Agregar Producto
+          </button>
+        </div>
+
+        <div
+          *ngIf="productsArray.length === 0"
+          class="text-center py-8 bg-gray-50 rounded-lg"
+        >
+          <p class="text-gray-500">
+            No hay productos agregados. Haz clic en "Agregar Producto" para
+            comenzar.
+          </p>
+        </div>
+
+        <div formArrayName="products">
+          <div
+            *ngFor="let productGroup of productsArray.controls; let i = index"
+            class="border rounded-lg p-4 mb-4 bg-gray-50"
+          >
+            <div
+              [formGroupName]="i"
+              class="grid grid-cols-1 md:grid-cols-6 gap-4"
+            >
+              <div class="md:col-span-2">
+                <label
+                  [for]="'productId' + i"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Producto <span class="text-red-600">*</span>
+                </label>
+                <select
+                  [id]="'productId' + i"
+                  formControlName="productId"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [ngClass]="{
+                    'border-red-500':
+                      productGroup.get('productId')?.invalid &&
+                      productGroup.get('productId')?.touched
+                  }"
+                  (change)="onProductSelect(i)"
+                >
+                  <option value="">Seleccionar producto</option>
+                  <option *ngFor="let product of products" [value]="product.id">
+                    {{ product.name }} - ${{ product.pricePerKilo }}/kg
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label
+                  [for]="'warehouseId' + i"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Almacén <span class="text-red-600">*</span>
+                </label>
+                <select
+                  [id]="'warehouseId' + i"
+                  formControlName="warehouseId"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [ngClass]="{
+                    'border-red-500':
+                      productGroup.get('warehouseId')?.invalid &&
+                      productGroup.get('warehouseId')?.touched
+                  }"
+                >
+                  <option value="">Seleccionar</option>
+                  <option
+                    *ngFor="let warehouse of warehouses"
+                    [value]="warehouse.id"
+                  >
+                    {{ warehouse.name }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label
+                  [for]="'quantity' + i"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Kilos <span class="text-red-600">*</span>
+                </label>
+                <input
+                  type="number"
+                  [id]="'quantity' + i"
+                  formControlName="quantity"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [ngClass]="{
+                    'border-red-500':
+                      productGroup.get('quantity')?.invalid &&
+                      productGroup.get('quantity')?.touched
+                  }"
+                  min="1"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label
+                  [for]="'boxes' + i"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Cajas <span class="text-red-600">*</span>
+                </label>
+                <input
+                  type="number"
+                  [id]="'boxes' + i"
+                  formControlName="boxes"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [ngClass]="{
+                    'border-red-500':
+                      productGroup.get('boxes')?.invalid &&
+                      productGroup.get('boxes')?.touched
+                  }"
+                  min="1"
+                />
+              </div>
+              <div>
+                <label
+                  [for]="'subtotal' + i"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Subtotal
+                </label>
+                <div class="flex items-center">
+                  <input
+                    type="text"
+                    [id]="'subtotal' + i"
+                    formControlName="subtotal"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100"
+                    readonly
+                  />
+                  <button
+                    type="button"
+                    (click)="removeProduct(i)"
+                    class="ml-2 text-red-600 hover:text-red-800"
+                    title="Eliminar producto"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total -->
+        <div *ngIf="productsArray.length > 0" class="mt-6 flex justify-end">
+          <div
+            class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right"
+          >
+            <p class="text-gray-700 mb-1">Total de Venta:</p>
+            <p class="text-2xl font-bold text-blue-800">
+              ${{ calculateTotal().toFixed(2) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end space-x-4">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{ 'opacity-50 cursor-not-allowed': isSubmitting }"
+        >
+          <span *ngIf="isSubmitting">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Guardando...
+          </span>
+          <span *ngIf="!isSubmitting">
+            {{ isEditMode ? 'Actualizar Venta' : 'Crear Venta' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

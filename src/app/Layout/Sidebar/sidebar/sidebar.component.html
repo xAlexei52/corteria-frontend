@@ -1,150 +1,238 @@
-<div class="relative h-screen">
-    <aside [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
-      class="w-64 h-full bg-white shadow-md flex flex-col fixed left-0 top-0 z-40 transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
-      <div class="p-4 flex-grow">
-        <div class="flex items-center mb-8 gap-2">
-          <img src="../../../../assets/images/corteria-logo.png" alt="logo" class="w-14 h-16">
-          <span class="text-xl font-semibold">LA CORTERIA</span>
+<div class="relative h-screen overflow-auto">
+  <aside
+    [ngClass]="{
+      'translate-x-0': isSidebarOpen,
+      '-translate-x-full': !isSidebarOpen
+    }"
+    class="w-64 h-full bg-white shadow-md flex flex-col fixed left-0 top-0 z-40 transition-transform duration-300 ease-in-out md:relative md:translate-x-0"
+  >
+    <div class="p-4 flex-grow">
+      <div class="flex items-center mb-8 gap-2">
+        <img
+          src="../../../../assets/images/corteria-logo.png"
+          alt="logo"
+          class="w-14 h-16"
+        />
+        <span class="text-xl font-semibold">LA CORTERIA</span>
+      </div>
+
+      <nav>
+        <p class="text-xs font-semibold text-gray-600 mb-2">MENU</p>
+
+        <!-- Inicio -->
+        <a
+          routerLink="home"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">dashboard</i>
+          Inicio
+        </a>
+
+        <!-- Entradas de trailer -->
+        <a
+          routerLink="trailer-entries"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">local_shipping</i>
+          Entradas de Trailer
+        </a>
+
+        <!-- Órdenes de Manufactura -->
+        <a
+          routerLink="manufacturing-orders"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">precision_manufacturing</i>
+          Órdenes de Manufactura
+        </a>
+
+        <!-- Ventas -->
+        <a
+          routerLink="sales"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">point_of_sale</i>
+          Ventas
+        </a>
+
+        <!-- Clientes con submenú -->
+        <div class="sidebar-item">
+          <button
+            (click)="toggleClientes()"
+            class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+            [ngClass]="{ 'bg-blue-100 text-blue-600': isClientesExpanded }"
+          >
+            <div class="flex items-center">
+              <i class="material-icons-outlined mr-3">people</i>
+              Clientes
+            </div>
+            <i
+              class="material-icons-outlined"
+              [ngClass]="{ 'rotate-180': isClientesExpanded }"
+              >expand_more</i
+            >
+          </button>
+
+          <div *ngIf="isClientesExpanded" class="pl-6 mt-2 space-y-2">
+            <a
+              routerLink="clients/list"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">list</i>
+              Listado
+            </a>
+            <a
+              routerLink="clients/new"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">person_add</i>
+              Nuevo Cliente
+            </a>
+          </div>
         </div>
-        
-        <nav>
-          <p class="text-xs font-semibold text-gray-600 mb-2">MENU</p>
-          
-          <!-- Inicio -->
-          <a routerLink="home" 
-             routerLinkActive="bg-blue-100 text-blue-600" 
-             [routerLinkActiveOptions]="{exact: true}"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">dashboard</i>
-             Inicio
-          </a>
-          
-          <!-- Entradas de trailer -->
-          <a routerLink="trailer-entries" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">local_shipping</i>
-             Entradas de Trailer
-          </a>
-          
-          <!-- Órdenes de Manufactura -->
-          <a routerLink="manufacturing-orders" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">precision_manufacturing</i>
-             Órdenes de Manufactura
-          </a>
-          
-          <!-- Ventas -->
-          <a routerLink="sales" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">point_of_sale</i>
-             Ventas
-          </a>
-          
-          <!-- Clientes con submenú -->
-          <div class="sidebar-item">
-            <button (click)="toggleClientes()" 
-                    class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
-                    [ngClass]="{'bg-blue-100 text-blue-600': isClientesExpanded}">
-              <div class="flex items-center">
-                <i class="material-icons-outlined mr-3">people</i>
-                Clientes
-              </div>
-              <i class="material-icons-outlined" [ngClass]="{'rotate-180': isClientesExpanded}">expand_more</i>
-            </button>
-    
-            <div *ngIf="isClientesExpanded" class="pl-6 mt-2 space-y-2">
-              <a routerLink="clients/list" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">list</i>
-                Listado
-              </a>
-              <a routerLink="clients/new" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">person_add</i>
-                Nuevo Cliente
-              </a>
-              <a routerLink="clients/finances" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">payments</i>
-                Estado Financiero
-              </a>
-              <a routerLink="clients/debts" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">account_balance</i>
-                Gestión de Deudas
-              </a>
+
+        <!-- Productos -->
+        <a
+          routerLink="products"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">inventory_2</i>
+          Productos
+        </a>
+
+        <!-- Almacenes -->
+        <a
+          routerLink="warehouses"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">warehouse</i>
+          Almacenes
+        </a>
+
+        <!-- Insumos y Recetas con submenú -->
+        <div class="sidebar-item">
+          <button
+            (click)="toggleInsumos()"
+            class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+            [ngClass]="{ 'bg-blue-100 text-blue-600': isInsumosExpanded }"
+          >
+            <div class="flex items-center">
+              <i class="material-icons-outlined mr-3">category</i>
+              Insumos y Recetas
             </div>
+            <i
+              class="material-icons-outlined"
+              [ngClass]="{ 'rotate-180': isInsumosExpanded }"
+              >expand_more</i
+            >
+          </button>
+
+          <div *ngIf="isInsumosExpanded" class="pl-6 mt-2 space-y-2">
+            <a
+              routerLink="supplies"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">inbox</i>
+              Insumos
+            </a>
+            <a
+              routerLink="recipes"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">menu_book</i>
+              Recetas
+            </a>
           </div>
-          
-          <!-- Productos -->
-          <a routerLink="products" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">inventory_2</i>
-             Productos
-          </a>
-          
-          <!-- Almacenes -->
-          <a routerLink="warehouses" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">warehouse</i>
-             Almacenes
-          </a>
-          
-          <!-- Insumos y Recetas con submenú -->
-          <div class="sidebar-item">
-            <button (click)="toggleInsumos()" 
-                    class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
-                    [ngClass]="{'bg-blue-100 text-blue-600': isInsumosExpanded}">
-              <div class="flex items-center">
-                <i class="material-icons-outlined mr-3">category</i>
-                Insumos y Recetas
-              </div>
-              <i class="material-icons-outlined" [ngClass]="{'rotate-180': isInsumosExpanded}">expand_more</i>
-            </button>
-    
-            <div *ngIf="isInsumosExpanded" class="pl-6 mt-2 space-y-2">
-              <a routerLink="supplies" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">inbox</i>
-                Insumos
-              </a>
-              <a routerLink="recipes" 
-                routerLinkActive="bg-blue-100 text-blue-600"
-                class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out">
-                <i class="material-icons-outlined mr-2 text-sm">menu_book</i>
-                Recetas
-              </a>
+        </div>
+
+        <!-- Usuarios -->
+        <a
+          routerLink="users"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">manage_accounts</i>
+          Usuarios
+        </a>
+
+        <!-- Gastos fijos -->
+        <a
+          routerLink="fixed-expenses/list"
+          routerLinkActive="bg-blue-100 text-blue-600"
+          class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+        >
+          <i class="material-icons-outlined mr-3">currency_exchange</i>
+          Gastos Fijos
+        </a>
+        <div class="my-3 border-t border-gray-200"></div>
+        <p class="text-xs font-semibold text-gray-600 mb-2 mt-4">PROYECTOS</p>
+        <!-- Insumos y Recetas con submenú -->
+        <div class="sidebar-item">
+          <button
+            (click)="toggleProyectos()"
+            class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
+            [ngClass]="{ 'bg-blue-100 text-blue-600': isProyectosExpanded }"
+          >
+            <div class="flex items-center">
+              <i class="material-icons-outlined mr-3">business_center</i>
+              Proyectos
             </div>
+            <i
+              class="material-icons-outlined"
+              [ngClass]="{ 'rotate-180': isProyectosExpanded }"
+              >expand_more</i
+            >
+          </button>
+
+          <div *ngIf="isProyectosExpanded" class="pl-6 mt-2 space-y-2">
+            <a
+              routerLink="projects/list"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">list</i>
+              Listado
+            </a>
+            <a
+              routerLink="projects/new"
+              routerLinkActive="bg-blue-100 text-blue-600"
+              class="flex items-center py-2 px-4 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+            >
+              <i class="material-icons-outlined mr-2 text-sm">add_business</i>
+              Nuevo Proyecto
+            </a>
           </div>
-          
-          <!-- Usuarios -->
-          <a routerLink="users" 
-             routerLinkActive="bg-blue-100 text-blue-600"
-             class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105">
-             <i class="material-icons-outlined mr-3">manage_accounts</i>
-             Usuarios
-          </a>
-        </nav>
-      </div>
-  
-      <div class="p-4">
-        <button (click)="logout()" class="flex items-center py-2 px-4 text-gray-700 hover:bg-blue-500 hover:text-white rounded-lg transition-all duration-200 ease-in-out hover:scale-105 w-full">
-          <i class="material-icons-outlined mr-3">logout</i>
-          Cerrar Sesión
-        </button>
-      </div>
-    </aside>
-  
-    <!-- Overlay para cerrar el sidebar en móviles -->
-    <div *ngIf="isSidebarOpen" (click)="closeSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"></div>
-  </div>
+        </div>
+      </nav>
+    </div>
+    <div class="my-3 border-t border-gray-200"></div>
+
+    <div class="p-4">
+      <button
+        (click)="logout()"
+        class="flex items-center py-2 px-4 text-gray-700 hover:bg-blue-500 hover:text-white rounded-lg transition-all duration-200 ease-in-out hover:scale-105 w-full"
+      >
+        <i class="material-icons-outlined mr-3">logout</i>
+        Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Overlay para cerrar el sidebar en móviles -->
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="closeSidebar()"
+    class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+  ></div>
+</div>

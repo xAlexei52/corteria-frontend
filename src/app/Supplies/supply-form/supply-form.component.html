@@ -1,0 +1,292 @@
+<!-- supply-form.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{ isEditMode ? 'Editar Insumo' : 'Nuevo Insumo' }}
+      </h1>
+      <p class="text-gray-600">
+        {{
+          isEditMode
+            ? 'Modifica los detalles del insumo'
+            : 'Registra un nuevo insumo para tus productos'
+        }}
+      </p>
+    </div>
+    <button
+      (click)="cancelForm()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Cancelar
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Formulario del insumo -->
+  <div *ngIf="!isLoading" class="bg-white rounded-xl shadow p-6">
+    <form [formGroup]="supplyForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <label
+            for="name"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Nombre del Insumo <span class="text-red-600">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                supplyForm.get('name')?.invalid &&
+                supplyForm.get('name')?.touched
+            }"
+            placeholder="Nombre del insumo"
+          />
+          <div
+            *ngIf="
+              supplyForm.get('name')?.invalid && supplyForm.get('name')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            El nombre del insumo es requerido
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <label
+            for="description"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Descripción
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="3"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Descripción del insumo"
+          ></textarea>
+        </div>
+
+        <div>
+          <label
+            for="unit"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Unidad de Medida <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="unit"
+            formControlName="unit"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                supplyForm.get('unit')?.invalid &&
+                supplyForm.get('unit')?.touched
+            }"
+          >
+            <option *ngFor="let unit of unitOptions" [value]="unit">
+              {{ unit }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              supplyForm.get('unit')?.invalid && supplyForm.get('unit')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            La unidad de medida es requerida
+          </div>
+        </div>
+
+        <div>
+          <label
+            for="costPerUnit"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Costo por Unidad <span class="text-red-600">*</span>
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span class="text-gray-500">$</span>
+            </div>
+            <input
+              type="number"
+              id="costPerUnit"
+              formControlName="costPerUnit"
+              class="pl-7 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [ngClass]="{
+                'border-red-500':
+                  supplyForm.get('costPerUnit')?.invalid &&
+                  supplyForm.get('costPerUnit')?.touched
+              }"
+              placeholder="0.00"
+              min="0.01"
+              step="0.01"
+            />
+          </div>
+          <div
+            *ngIf="
+              supplyForm.get('costPerUnit')?.invalid &&
+              supplyForm.get('costPerUnit')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            <div *ngIf="supplyForm.get('costPerUnit')?.errors?.['required']">
+              El costo es requerido
+            </div>
+            <div *ngIf="supplyForm.get('costPerUnit')?.errors?.['min']">
+              El costo debe ser mayor a cero
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="active"
+              formControlName="active"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label for="active" class="ml-2 block text-sm text-gray-900">
+              Insumo activo
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            Los insumos inactivos no aparecerán en las listas de selección para
+            nuevos productos.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4 mt-8">
+        <button
+          type="button"
+          (click)="cancelForm()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{ 'opacity-50 cursor-not-allowed': isSubmitting }"
+        >
+          <span *ngIf="isSubmitting">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Guardando...
+          </span>
+          <span *ngIf="!isSubmitting">
+            {{ isEditMode ? 'Actualizar Insumo' : 'Crear Insumo' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

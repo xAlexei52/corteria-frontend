@@ -1,0 +1,15 @@
+/* src/app/modules/projects/pages/project-expense-form/project-expense-form.component.css */
+.material-icons-outlined {
+  vertical-align: middle;
+}
+
+/* Estilo para ocultar las flechas de incremento/decremento en campos numéricos */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}

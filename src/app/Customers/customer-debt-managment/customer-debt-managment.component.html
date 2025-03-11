@@ -1,0 +1,296 @@
+<!-- customer-debt-management.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Gestión de Deuda</h1>
+      <p class="text-gray-600" *ngIf="customer">{{ getFullName() }}</p>
+    </div>
+    <button
+      (click)="goBack()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Información no encontrada -->
+  <div
+    *ngIf="!isLoading && !customer"
+    class="bg-white rounded-xl shadow p-6 text-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-16 w-16 text-gray-400 mx-auto mb-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">
+      Cliente no encontrado
+    </h2>
+    <p class="text-gray-600 mb-4">
+      No se encontró la información del cliente solicitado.
+    </p>
+    <button
+      (click)="goBack()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+    >
+      Volver
+    </button>
+  </div>
+
+  <!-- Contenido de gestión de deuda -->
+  <div *ngIf="!isLoading && customer" class="space-y-6">
+    <!-- Acciones rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <button
+        (click)="viewCustomerDetails()"
+        class="bg-blue-600 text-white p-4 rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+          <path
+            fill-rule="evenodd"
+            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Ver Detalles del Cliente
+      </button>
+      <button
+        (click)="viewFinancialSummary()"
+        class="bg-green-600 text-white p-4 rounded-lg flex items-center justify-center hover:bg-green-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"
+          />
+        </svg>
+        Ver Estado Financiero
+      </button>
+    </div>
+
+    <!-- Resumen de deuda -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <div
+        class="p-6 border-b border-gray-200 flex justify-between items-center"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">Estado de Deuda</h3>
+        <div
+          [ngClass]="
+            debtInfo.hasDebt
+              ? debtInfo.oldestDebtDays > 15
+                ? 'bg-red-100 text-red-800'
+                : debtInfo.oldestDebtDays > 0
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-yellow-100 text-yellow-800'
+              : 'bg-green-100 text-green-800'
+          "
+          class="px-3 py-1 rounded-full text-xs font-medium"
+        >
+          {{
+            debtInfo.hasDebt
+              ? debtInfo.oldestDebtDays > 15
+                ? 'Deuda Vencida'
+                : debtInfo.oldestDebtDays > 0
+                ? 'Por Vencer'
+                : 'Pendiente'
+              : 'Sin Deuda'
+          }}
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div *ngIf="!debtInfo.hasDebt" class="text-center py-8">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 text-green-500 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">
+            ¡Cliente sin Deuda!
+          </h2>
+          <p class="text-gray-600">
+            Este cliente no tiene deudas pendientes actualmente.
+          </p>
+        </div>
+
+        <div
+          *ngIf="debtInfo.hasDebt"
+          class="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">Deuda Total</h4>
+            <p class="text-red-600 font-semibold text-2xl">
+              ${{ parseFloat(debtInfo.debtAmount).toFixed(2) }}
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">
+              Ventas Pendientes
+            </h4>
+            <p class="text-gray-900 font-semibold text-2xl">
+              {{ debtInfo.pendingSales }}
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">
+              Días de Atraso
+            </h4>
+            <p
+              [ngClass]="
+                debtInfo.oldestDebtDays > 15
+                  ? 'text-red-600 font-semibold text-2xl'
+                  : debtInfo.oldestDebtDays > 0
+                  ? 'text-yellow-600 font-semibold text-2xl'
+                  : 'text-gray-900 font-semibold text-2xl'
+              "
+            >
+              {{ debtInfo.oldestDebtDays }} días
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje para los próximos desarrollos -->
+    <div *ngIf="debtInfo.hasDebt" class="bg-white rounded-xl shadow p-6">
+      <div class="text-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 text-blue-500 mx-auto mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          />
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">
+          Funcionalidades en Desarrollo
+        </h2>
+        <p class="text-gray-600 mb-4">
+          Las funcionalidades de gestión detallada de deudas, registro de pagos
+          e historial de pagos estarán disponibles próximamente.
+        </p>
+        <button
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled
+        >
+          Registrar Pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

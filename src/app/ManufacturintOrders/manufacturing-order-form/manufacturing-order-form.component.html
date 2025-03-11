@@ -1,0 +1,289 @@
+<!-- manufacturing-order-form.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        Nueva Orden de Fabricación
+      </h1>
+      <p class="text-gray-600">
+        Crea una orden para procesar la entrada de trailer
+      </p>
+    </div>
+    <button
+      (click)="cancel()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Detalles de la entrada -->
+  <div
+    *ngIf="!isLoading && trailerEntry"
+    class="bg-white rounded-xl shadow p-6 mb-6"
+  >
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">
+      Detalles de la Entrada
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Referencia</h3>
+        <p class="text-gray-900">{{ trailerEntry.reference }}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Producto</h3>
+        <p class="text-gray-900">
+          {{ trailerEntry.product?.name || 'Sin producto' }}
+        </p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Proveedor</h3>
+        <p class="text-gray-900">{{ trailerEntry.supplier }}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Cajas</h3>
+        <p class="text-gray-900">{{ trailerEntry.boxes }}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Kilos</h3>
+        <p class="text-gray-900">{{ trailerEntry.kilos }} kg</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Ciudad</h3>
+        <p class="text-gray-900">{{ trailerEntry.city }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de orden -->
+  <div
+    *ngIf="!isLoading && trailerEntry"
+    class="bg-white rounded-xl shadow p-6"
+  >
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">
+      Detalles de la Orden de Fabricación
+    </h2>
+
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Kilos a procesar -->
+        <div>
+          <label
+            for="kilosToProcess"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Kilos a Procesar <span class="text-red-500">*</span></label
+          >
+          <input
+            type="number"
+            id="kilosToProcess"
+            formControlName="kilosToProcess"
+            min="0.1"
+            step="0.1"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('kilosToProcess') }"
+          />
+          <p
+            *ngIf="isFieldInvalid('kilosToProcess')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('kilosToProcess') }}
+          </p>
+        </div>
+
+        <!-- Cajas estimadas -->
+        <div>
+          <label
+            for="boxesEstimated"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Cajas Estimadas <span class="text-red-500">*</span></label
+          >
+          <input
+            type="number"
+            id="boxesEstimated"
+            formControlName="boxesEstimated"
+            min="1"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('boxesEstimated') }"
+          />
+          <p
+            *ngIf="isFieldInvalid('boxesEstimated')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('boxesEstimated') }}
+          </p>
+        </div>
+
+        <!-- Almacén destino -->
+        <div>
+          <label
+            for="destinationWarehouseId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Almacén Destino <span class="text-red-500">*</span></label
+          >
+          <select
+            id="destinationWarehouseId"
+            formControlName="destinationWarehouseId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500': isFieldInvalid('destinationWarehouseId')
+            }"
+          >
+            <option value="">Seleccione un almacén</option>
+            <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">
+              {{ warehouse.name }}
+            </option>
+          </select>
+          <p
+            *ngIf="isFieldInvalid('destinationWarehouseId')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('destinationWarehouseId') }}
+          </p>
+        </div>
+
+        <!-- Notas -->
+        <div class="md:col-span-2">
+          <label
+            for="notes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Notas</label
+          >
+          <textarea
+            id="notes"
+            formControlName="notes"
+            rows="3"
+            placeholder="Instrucciones o comentarios adicionales para esta orden"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="orderForm.invalid || isLoading"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{
+            'opacity-50 cursor-not-allowed': orderForm.invalid || isLoading
+          }"
+        >
+          <span *ngIf="!isLoading">Crear Orden</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  [ngClass]="{
+    'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md': true,
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0 transition-opacity duration-300': isClosing
+  }"
+  class="transition-opacity duration-300"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

@@ -1,0 +1,241 @@
+<!-- src/app/modules/projects/pages/project-detail/project-detail.component.html -->
+<div class="w-full h-full">
+  <div class="h-auto flex flex-col w-full">
+    <!-- Encabezado y botones de acción -->
+    <div
+      class="flex flex-col md:flex-row md:justify-between mb-6 space-y-4 md:space-y-0 w-full"
+    >
+      <div class="flex items-center">
+        <button
+          (click)="goBack()"
+          class="mr-4 p-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <i class="material-icons-outlined">arrow_back</i>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-800">Detalles del Proyecto</h1>
+      </div>
+
+      <div class="flex space-x-2">
+        <button
+          (click)="editProject()"
+          class="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          <i class="material-icons-outlined mr-1">edit</i> Editar
+        </button>
+        <div class="relative group">
+          <button
+            class="flex items-center px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+          >
+            <i class="material-icons-outlined mr-1">more_vert</i> Acciones
+          </button>
+          <div
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-10 hidden group-hover:block"
+          >
+            <div class="py-1">
+              <button
+                *ngIf="project?.status !== 'completed'"
+                (click)="updateStatus('completed')"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+              >
+                <i class="material-icons-outlined mr-2 text-blue-600"
+                  >check_circle</i
+                >
+                Marcar como Completado
+              </button>
+              <button
+                *ngIf="project?.status !== 'active'"
+                (click)="updateStatus('active')"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+              >
+                <i class="material-icons-outlined mr-2 text-green-600"
+                  >play_circle</i
+                >
+                Marcar como Activo
+              </button>
+              <button
+                *ngIf="project?.status !== 'cancelled'"
+                (click)="updateStatus('cancelled')"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+              >
+                <i class="material-icons-outlined mr-2 text-red-600">cancel</i>
+                Cancelar Proyecto
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div
+      *ngIf="loading"
+      class="bg-white rounded-lg shadow-md p-6 text-center flex-grow flex items-center justify-center w-full"
+    >
+      <div>
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"
+        ></div>
+        <p class="mt-2 text-gray-600">Cargando información del proyecto...</p>
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div
+      *ngIf="error"
+      class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded w-full"
+    >
+      <p class="font-bold">Error</p>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Contenido del proyecto -->
+    <div
+      *ngIf="project && !loading"
+      class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow w-full"
+    >
+      <!-- Información general -->
+      <div class="lg:col-span-2 w-full">
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col w-full"
+        >
+          <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2
+              class="text-xl font-semibold text-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span class="mr-2">{{ project.name }}</span>
+              <span
+                [ngClass]="getStatusClass(project.status)"
+                class="text-sm px-3 py-1 rounded-full mt-2 sm:mt-0 inline-block sm:inline"
+              >
+                {{ getStatusText(project.status) }}
+              </span>
+            </h2>
+          </div>
+          <div class="p-6 flex-grow">
+            <!-- Descripción -->
+            <div class="mb-6">
+              <h3 class="text-gray-700 font-medium mb-2">Descripción</h3>
+              <p class="text-gray-600">
+                {{ project.description || 'No hay descripción disponible' }}
+              </p>
+            </div>
+
+            <!-- Detalles en grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">Ubicación</h3>
+                <p class="text-gray-600">
+                  {{ project.location || 'No especificada' }}
+                </p>
+              </div>
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">Fecha de Inicio</h3>
+                <p class="text-gray-600">{{ formatDate(project.startDate) }}</p>
+              </div>
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">
+                  Fecha Estimada de Finalización
+                </h3>
+                <p class="text-gray-600">
+                  {{ formatDate(project.estimatedEndDate) }}
+                </p>
+              </div>
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">
+                  Fecha de Finalización
+                </h3>
+                <p class="text-gray-600">{{ formatDate(project.endDate) }}</p>
+              </div>
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">Creado por</h3>
+                <p class="text-gray-600">
+                  {{ project.creator?.firstName || 'Usuario' }}
+                  {{ project.creator?.lastName || '' }}
+                </p>
+              </div>
+              <div>
+                <h3 class="text-gray-700 font-medium mb-2">
+                  Fecha de Creación
+                </h3>
+                <p class="text-gray-600">{{ formatDate(project.createdAt) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de información -->
+      <div class="lg:col-span-1 space-y-6 flex flex-col w-full">
+        <!-- Estado del proyecto -->
+        <div class="bg-white rounded-lg shadow-md p-6 w-full">
+          <h3 class="text-gray-800 font-semibold mb-4">Estado del Proyecto</h3>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Estado:</span>
+              <span
+                [ngClass]="getStatusClass(project.status)"
+                class="px-3 py-1 rounded-full text-sm font-medium"
+              >
+                {{ getStatusText(project.status) }}
+              </span>
+            </div>
+
+            <div
+              *ngIf="project.status === 'active' && project.estimatedEndDate"
+              class="flex justify-between items-center"
+            >
+              <span class="text-gray-600">Días restantes:</span>
+              <span
+                [ngClass]="getDaysLeftClass()"
+                class="px-3 py-1 rounded-full text-sm font-medium"
+              >
+                {{ getDaysLeftText() }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Finanzas del proyecto -->
+        <div class="bg-white rounded-lg shadow-md p-6 flex-grow w-full">
+          <h3 class="text-gray-800 font-semibold mb-4">Finanzas</h3>
+
+          <div class="space-y-4 flex flex-col h-full">
+            <button
+              (click)="viewFinancialSummary()"
+              class="w-full flex items-center justify-between p-3 bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 transition-colors"
+            >
+              <span class="flex items-center">
+                <i class="material-icons-outlined mr-2">bar_chart</i>
+                Resumen Financiero
+              </span>
+              <i class="material-icons-outlined">chevron_right</i>
+            </button>
+
+            <button
+              (click)="viewExpenses()"
+              class="w-full flex items-center justify-between p-3 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors"
+            >
+              <span class="flex items-center">
+                <i class="material-icons-outlined mr-2">payments</i>
+                Gastos
+              </span>
+              <i class="material-icons-outlined">chevron_right</i>
+            </button>
+
+            <button
+              (click)="viewIncomes()"
+              class="w-full flex items-center justify-between p-3 bg-green-50 text-green-700 rounded-md hover:bg-green-100 transition-colors"
+            >
+              <span class="flex items-center">
+                <i class="material-icons-outlined mr-2">payments</i>
+                Ingresos
+              </span>
+              <i class="material-icons-outlined">chevron_right</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
