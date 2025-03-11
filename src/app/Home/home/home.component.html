@@ -302,34 +302,38 @@
     </div>
 
     <!-- Ventas Recientes -->
+    <!-- Modificación para la tabla de Ventas Recientes -->
     <div class="bg-white p-6 rounded-lg shadow dashboard-card mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Ventas Recientes</h2>
         <a href="#" class="text-blue-500 hover:underline">Ver todas</a>
       </div>
+      <!-- Contenedor con overflow-auto para hacer la tabla responsiva -->
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full divide-y divide-gray-200">
           <thead>
             <tr class="text-left text-gray-500 text-sm">
-              <th class="pb-3 font-medium">Número</th>
-              <th class="pb-3 font-medium">Fecha</th>
-              <th class="pb-3 font-medium">Cliente</th>
-              <th class="pb-3 font-medium">Monto</th>
-              <th class="pb-3 font-medium">Pagado</th>
-              <th class="pb-3 font-medium">Estado</th>
-              <th class="pb-3 font-medium">Acciones</th>
+              <th class="pb-3 font-medium px-4">Número</th>
+              <th class="pb-3 font-medium px-4">Fecha</th>
+              <th class="pb-3 font-medium px-4">Cliente</th>
+              <th class="pb-3 font-medium px-4">Monto</th>
+              <th class="pb-3 font-medium px-4">Pagado</th>
+              <th class="pb-3 font-medium px-4">Estado</th>
+              <th class="pb-3 font-medium px-4">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let sale of dashboardData.recentSales.slice(0, 5)"
-              class="border-t border-gray-100"
+              class="border-t border-gray-100 hover:bg-gray-50"
             >
-              <td class="py-3">
+              <td class="py-3 px-4 whitespace-nowrap">
                 <div class="font-medium">{{ sale.saleNumber }}</div>
               </td>
-              <td class="py-3">{{ formatDate(sale.date) }}</td>
-              <td class="py-3">
+              <td class="py-3 px-4 whitespace-nowrap">
+                {{ formatDate(sale.date) }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div
                     class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold mr-2"
@@ -340,9 +344,13 @@
                   {{ getFullName(sale.customer) }}
                 </div>
               </td>
-              <td class="py-3">{{ formatCurrency(sale.totalAmount) }}</td>
-              <td class="py-3">{{ formatCurrency(sale.paidAmount) }}</td>
-              <td class="py-3">
+              <td class="py-3 px-4 whitespace-nowrap">
+                {{ formatCurrency(sale.totalAmount) }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                {{ formatCurrency(sale.paidAmount) }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
                 <span
                   [ngClass]="getSaleStatusClass(sale.status)"
                   class="px-2 py-1 rounded-full text-xs"
@@ -350,7 +358,7 @@
                   {{ getSaleStatusText(sale.status) }}
                 </span>
               </td>
-              <td class="py-3">
+              <td class="py-3 px-4 whitespace-nowrap">
                 <div class="flex">
                   <button
                     class="text-gray-500 hover:text-gray-700 mr-2"
@@ -397,37 +405,42 @@
       </div>
     </div>
 
-    <!-- Entradas Recientes -->
+    <!-- Modificación para la tabla de Entradas Recientes -->
     <div class="bg-white p-6 rounded-lg shadow dashboard-card">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Entradas Recientes</h2>
         <a href="#" class="text-blue-500 hover:underline">Ver todas</a>
       </div>
+      <!-- Contenedor con overflow-auto para hacer la tabla responsiva -->
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full divide-y divide-gray-200">
           <thead>
             <tr class="text-left text-gray-500 text-sm">
-              <th class="pb-3 font-medium">Fecha</th>
-              <th class="pb-3 font-medium">Producto</th>
-              <th class="pb-3 font-medium">Proveedor</th>
-              <th class="pb-3 font-medium">Kilos</th>
-              <th class="pb-3 font-medium">Cajas</th>
-              <th class="pb-3 font-medium">Ciudad</th>
-              <th class="pb-3 font-medium">Referencia</th>
+              <th class="pb-3 font-medium px-4">Fecha</th>
+              <th class="pb-3 font-medium px-4">Producto</th>
+              <th class="pb-3 font-medium px-4">Proveedor</th>
+              <th class="pb-3 font-medium px-4">Kilos</th>
+              <th class="pb-3 font-medium px-4">Cajas</th>
+              <th class="pb-3 font-medium px-4">Ciudad</th>
+              <th class="pb-3 font-medium px-4">Referencia</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let entry of dashboardData.recentEntries.slice(0, 5)"
-              class="border-t border-gray-100"
+              class="border-t border-gray-100 hover:bg-gray-50"
             >
-              <td class="py-3">{{ formatDate(entry.date) }}</td>
-              <td class="py-3">{{ entry.product.name }}</td>
-              <td class="py-3">{{ entry.supplier }}</td>
-              <td class="py-3">{{ entry.kilos }}</td>
-              <td class="py-3">{{ entry.boxes }}</td>
-              <td class="py-3">{{ entry.city }}</td>
-              <td class="py-3">{{ entry.reference }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                {{ formatDate(entry.date) }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                {{ entry.product.name }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">{{ entry.supplier }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">{{ entry.kilos }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">{{ entry.boxes }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">{{ entry.city }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">{{ entry.reference }}</td>
             </tr>
 
             <!-- Mensaje si no hay entradas -->

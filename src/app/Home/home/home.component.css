@@ -1,0 +1,58 @@
+.overflow-x-auto {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overflow-x-auto table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Asegura que los bordes y fondos de cabecera se muestren correctamente */
+.overflow-x-auto table thead tr {
+  background-color: #f9fafb;
+}
+
+.overflow-x-auto table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f9fafb;
+}
+
+.overflow-x-auto table tbody tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* Mantiene el espacio consistente */
+.overflow-x-auto table th,
+.overflow-x-auto table td {
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+/* Estilo para la sombra que indica desplazamiento horizontal */
+@media (max-width: 1024px) {
+  .overflow-x-auto::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.8)
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .overflow-x-auto:not(.no-scroll)::after {
+    opacity: 1;
+  }
+}

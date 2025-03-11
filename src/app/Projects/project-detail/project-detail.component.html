@@ -22,19 +22,24 @@
         >
           <i class="material-icons-outlined mr-1">edit</i> Editar
         </button>
-        <div class="relative group">
+        <!-- src/app/modules/projects/pages/project-detail/project-detail.component.html -->
+        <!-- Sólo la parte del menú de Acciones que necesita ser modificada -->
+
+        <div class="relative">
           <button
+            (click)="toggleActionsMenu()"
             class="flex items-center px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
             <i class="material-icons-outlined mr-1">more_vert</i> Acciones
           </button>
           <div
-            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-10 hidden group-hover:block"
+            *ngIf="showActionsMenu"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-10"
           >
             <div class="py-1">
               <button
                 *ngIf="project?.status !== 'completed'"
-                (click)="updateStatus('completed')"
+                (click)="updateStatus('completed'); toggleActionsMenu()"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
               >
                 <i class="material-icons-outlined mr-2 text-blue-600"
@@ -44,7 +49,7 @@
               </button>
               <button
                 *ngIf="project?.status !== 'active'"
-                (click)="updateStatus('active')"
+                (click)="updateStatus('active'); toggleActionsMenu()"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
               >
                 <i class="material-icons-outlined mr-2 text-green-600"
@@ -54,7 +59,7 @@
               </button>
               <button
                 *ngIf="project?.status !== 'cancelled'"
-                (click)="updateStatus('cancelled')"
+                (click)="updateStatus('cancelled'); toggleActionsMenu()"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
               >
                 <i class="material-icons-outlined mr-2 text-red-600">cancel</i>
