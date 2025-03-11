@@ -1,5 +1,5 @@
 // src/app/modules/projects/pages/project-detail/project-detail.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectService } from 'src/app/_services/Projects/project.service';
 
@@ -13,6 +13,7 @@ export class ProjectDetailComponent implements OnInit {
   project: any = null;
   loading: boolean = false;
   error: string | null = null;
+  showActionsMenu: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,6 +27,22 @@ export class ProjectDetailComponent implements OnInit {
       this.loadProject();
     } else {
       this.error = 'ID de proyecto no proporcionado';
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event): void {
+    const actionsButton = document.querySelector('.actions-menu-button');
+    const actionsMenu = document.querySelector('.actions-menu');
+
+    // Si el clic no fue ni en el botón ni en el menú, cerramos el menú
+    if (actionsButton && actionsMenu) {
+      if (
+        !actionsButton.contains(event.target as Node) &&
+        !actionsMenu.contains(event.target as Node)
+      ) {
+        this.showActionsMenu = false;
+      }
     }
   }
 
@@ -166,5 +183,9 @@ export class ProjectDetailComponent implements OnInit {
     }
 
     return 'bg-green-100 text-green-700';
+  }
+
+  toggleActionsMenu(): void {
+    this.showActionsMenu = !this.showActionsMenu;
   }
 }
