@@ -303,7 +303,7 @@ export class SaleFormComponent implements OnInit {
             }, 1500); 
           }else {
             this.showAlert(
-              'Error al crear la ventaa: ' + response.message,
+              'Error al crear la venta: ' + response.message,
               false
             );
           }
@@ -361,11 +361,9 @@ export class SaleFormComponent implements OnInit {
           this.entries.forEach((e) => {
             if (e.product.id == product) {
               this.helper += parseFloat(e.kilos)
-              console.log(this.helper + "kilos")
             }
             console.log(productQuantity)
             if (this.helper < productQuantity){
-              console.log(this.helper+" es menor a "+productQuantity)
               this.showAlert('Error al crear la venta: El pedido sobrepasa el total de kilos registrado... ' + this.helper + " Kilos disponibles para este producto"  , false);
             }
           })
