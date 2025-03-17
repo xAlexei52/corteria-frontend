@@ -5,6 +5,7 @@ import { SalesService } from 'src/app/_services/Sales/sales.service';
 import { CustomersService } from 'src/app/_services/Customers/customers.service';
 import { ProductsService } from 'src/app/_services/Products/products.service';
 import { WarehousesService } from 'src/app/_services/Warehouses/warehouses.service';
+import { TrailerEntriesService } from 'src/app/_services/TrailerEntry/trailer-entries.service';
 
 @Component({
   selector: 'app-sale-form',
@@ -29,6 +30,9 @@ export class SaleFormComponent implements OnInit {
   isSuccess: boolean = false;
   isClosing: boolean = false;
 
+  entries: any[] = [];
+  helper = 0;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -36,7 +40,8 @@ export class SaleFormComponent implements OnInit {
     private salesService: SalesService,
     private customersService: CustomersService,
     private productsService: ProductsService,
-    private warehousesService: WarehousesService
+    private warehousesService: WarehousesService,
+    private trailerEntriesService: TrailerEntriesService
   ) {
     this.createForm();
   }
@@ -45,7 +50,6 @@ export class SaleFormComponent implements OnInit {
     this.loadCustomers();
     this.loadProducts();
     this.loadWarehouses();
-
     this.route.params.subscribe((params) => {
       if (params['id']) {
         this.saleId = params['id'];
@@ -237,6 +241,7 @@ export class SaleFormComponent implements OnInit {
   onProductSelect(index: number): void {
     const productGroup = this.productsArray.at(index) as FormGroup;
     const productId = productGroup.get('productId')?.value;
+  
 
     if (productId) {
       const selectedProduct = this.products.find((p) => p.id === productId);
@@ -281,6 +286,7 @@ export class SaleFormComponent implements OnInit {
 
     this.isSubmitting = true;
 
+    
     if (this.isEditMode) {
       // No implementamos la edición de ventas ya que puede ser compleja
       // debido a cambios en inventario, pagos, etc.
@@ -294,8 +300,8 @@ export class SaleFormComponent implements OnInit {
             this.showAlert('Venta creada exitosamente', true);
             setTimeout(() => {
               this.router.navigate(['/sales/details', response.sale.id]);
-            }, 1500);
-          } else {
+            }, 1500); 
+          }else {
             this.showAlert(
               'Error al crear la venta: ' + response.message,
               false
@@ -303,6 +309,9 @@ export class SaleFormComponent implements OnInit {
           }
         },
         error: (err) => {
+          saleData.products.forEach((e: any) => {
+            this.loadEntries(e.productId, e.quantity)
+          }); 
           this.isSubmitting = false;
           this.showAlert('Error al crear la venta: ' + err.message, false);
         },
@@ -343,4 +352,26 @@ export class SaleFormComponent implements OnInit {
       }, 300);
     }, 5000);
   }
+
+  loadEntries(product: any, productQuantity: any): void {
+    this.trailerEntriesService.getTotalAmount(product).subscribe({
+      next: (response) => {
+        if(response.success){
+          this.entries = response.entries;
+          this.entries.forEach((e) => {
+            if (e.product.id == product) {
+              this.helper += parseFloat(e.kilos)
+            }
+            console.log(productQuantity)
+            if (this.helper < productQuantity){
+              this.showAlert('Error al crear la venta: El pedido sobrepasa el total de kilos registrado... ' + this.helper + " Kilos disponibles para este producto"  , false);
+            }
+          })
+        }
+      }
+    })
+  }
+
 }
+
+
