@@ -78,13 +78,4 @@ export class TrailerEntriesService {
     return throwError(() => new Error(errorMessage));
   }
 
-  getTotalAmount(product?: any){
-    let httpParams = new HttpParams();
-    httpParams = httpParams.set('productId', product)
-      return this.http
-      .get<any>(this.apiUrl, { params: httpParams })
-      .pipe(catchError(this.handleError));
-  }
-
-
 }
