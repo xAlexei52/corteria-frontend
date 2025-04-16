@@ -46,6 +46,7 @@ import { ProjectExpenseListComponent } from './Projects/project-expense-list/pro
 import { ProjectExpenseFormComponent } from './Projects/project-expense-form/project-expense-form.component';
 import { ProjectIncomeListComponent } from './Projects/project-income-list/project-income-list.component';
 import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
+import { RoleGuard } from './_services/AuthService/role.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -55,7 +56,8 @@ const routes: Routes = [
   {
     path: '',
     component: DashboardLayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
+    data: { roles: ['admin','user','manager'] },
     children: [
       { path: 'home', component: HomeComponent },
       {

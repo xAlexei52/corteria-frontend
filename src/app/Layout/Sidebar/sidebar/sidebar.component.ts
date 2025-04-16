@@ -16,7 +16,25 @@ export class SidebarComponent {
   isInsumosExpanded: boolean = false;
   isProyectosExpanded: boolean = false;
 
-  constructor(private usersService: UsersService, private router: Router) {}
+  role: string = '';
+
+
+  constructor(private usersService: UsersService, private router: Router) {
+    const user = this.usersService.getCurrentUserData();
+    this.role = user?.role || '';
+  }
+
+  get isAdmin() {
+    return this.role === 'admin';
+  }
+  
+  get isManager() {
+    return this.role === 'manager';
+  }
+  
+  get isRegularUser() {
+    return this.role === 'user';
+  }
 
   closeSidebar() {
     this.toggleSidebar.emit();

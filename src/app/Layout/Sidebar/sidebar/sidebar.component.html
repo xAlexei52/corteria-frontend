@@ -42,6 +42,7 @@
 
         <!-- Órdenes de Manufactura -->
         <a
+          *ngIf="isAdmin || isManager"
           routerLink="manufacturing-orders"
           routerLinkActive="bg-blue-100 text-blue-600"
           class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -52,6 +53,7 @@
 
         <!-- Ventas -->
         <a
+          *ngIf="isAdmin || isManager"
           routerLink="sales"
           routerLinkActive="bg-blue-100 text-blue-600"
           class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -61,7 +63,7 @@
         </a>
 
         <!-- Clientes con submenú -->
-        <div class="sidebar-item">
+        <div *ngIf="isAdmin || isManager" class="sidebar-item">
           <button
             (click)="toggleClientes()"
             class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -110,6 +112,7 @@
 
         <!-- Almacenes -->
         <a
+          *ngIf="isAdmin || isManager"
           routerLink="warehouses"
           routerLinkActive="bg-blue-100 text-blue-600"
           class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -119,7 +122,7 @@
         </a>
 
         <!-- Insumos y Recetas con submenú -->
-        <div class="sidebar-item">
+        <div *ngIf="isAdmin || isManager" class="sidebar-item">
           <button
             (click)="toggleInsumos()"
             class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -158,6 +161,7 @@
 
         <!-- Usuarios -->
         <a
+          *ngIf="isAdmin"
           routerLink="users"
           routerLinkActive="bg-blue-100 text-blue-600"
           class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -168,6 +172,7 @@
 
         <!-- Gastos fijos -->
         <a
+          *ngIf="isAdmin || isManager"
           routerLink="fixed-expenses/list"
           routerLinkActive="bg-blue-100 text-blue-600"
           class="flex items-center py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
@@ -176,9 +181,9 @@
           Gastos Fijos
         </a>
         <div class="my-3 border-t border-gray-200"></div>
-        <p class="text-xs font-semibold text-gray-600 mb-2 mt-4">PROYECTOS</p>
+        <p *ngIf="isAdmin || isManager" class="text-xs font-semibold text-gray-600 mb-2 mt-4">PROYECTOS</p>
         <!-- Insumos y Recetas con submenú -->
-        <div class="sidebar-item">
+        <div *ngIf="isAdmin || isManager" class="sidebar-item">
           <button
             (click)="toggleProyectos()"
             class="flex items-center justify-between w-full py-2 px-4 rounded-lg mb-1 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out hover:scale-105"
