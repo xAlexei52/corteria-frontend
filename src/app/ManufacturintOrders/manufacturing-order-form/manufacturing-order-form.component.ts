@@ -32,7 +32,8 @@ export class ManufacturingOrderFormComponent implements OnInit {
     this.orderForm = this.fb.group({
       trailerEntryId: ['', Validators.required],
       productId: ['', Validators.required],
-      kilosToProcess: ['', [Validators.required, Validators.min(0.1)]],
+      usedKilos: ['', [Validators.required, Validators.min(0.1)]],
+      totalOutputKilos: ['', [Validators.required, Validators.min(0.1)]],
       boxesEstimated: ['', [Validators.required, Validators.min(1)]],
       notes: [''],
       destinationWarehouseId: ['', Validators.required],
@@ -50,6 +51,13 @@ export class ManufacturingOrderFormComponent implements OnInit {
         this.router.navigate(['/trailer-entries']);
       }
     });
+
+    // Cuando cambia usedKilos, actualizar totalOutputKilos por defecto
+    this.orderForm.get('usedKilos')?.valueChanges.subscribe((value) => {
+      if (value && !this.orderForm.get('totalOutputKilos')?.value) {
+        this.orderForm.get('totalOutputKilos')?.setValue(value);
+      }
+    });
   }
 
   loadTrailerEntry(): void {
@@ -61,13 +69,51 @@ export class ManufacturingOrderFormComponent implements OnInit {
           if (response.success) {
             this.trailerEntry = response.entry;
 
+            // Verificar si la entrada necesita procesamiento y tiene kilos disponibles
+            if (!this.trailerEntry.needsProcessing) {
+              this.showAlert('Esta entrada no requiere procesamiento', false);
+              setTimeout(() => {
+                this.router.navigate([
+                  '/trailer-entries/details',
+                  this.trailerEntryId,
+                ]);
+              }, 2000);
+              return;
+            }
+
+            if (this.trailerEntry.availableKilos <= 0) {
+              this.showAlert(
+                'Esta entrada no tiene kilos disponibles para procesar',
+                false
+              );
+              setTimeout(() => {
+                this.router.navigate([
+                  '/trailer-entries/details',
+                  this.trailerEntryId,
+                ]);
+              }, 2000);
+              return;
+            }
+
             // Pre-llenar el formulario con los datos de la entrada
             this.orderForm.patchValue({
               trailerEntryId: this.trailerEntryId,
               productId: this.trailerEntry.productId,
-              kilosToProcess: this.trailerEntry.kilos,
+              usedKilos: this.trailerEntry.availableKilos,
+              totalOutputKilos: this.trailerEntry.availableKilos,
               boxesEstimated: this.trailerEntry.boxes,
             });
+
+            // Validación personalizada para usedKilos
+            const usedKilosControl = this.orderForm.get('usedKilos');
+            if (usedKilosControl) {
+              usedKilosControl.setValidators([
+                Validators.required,
+                Validators.min(0.1),
+                Validators.max(this.trailerEntry.availableKilos),
+              ]);
+              usedKilosControl.updateValueAndValidity();
+            }
 
             this.isLoading = false;
           } else {
@@ -116,6 +162,16 @@ export class ManufacturingOrderFormComponent implements OnInit {
   onSubmit(): void {
     if (this.orderForm.invalid) {
       this.markFormGroupTouched(this.orderForm);
+      return;
+    }
+
+    // Verificar que usedKilos no sea mayor que availableKilos
+    const usedKilos = Number(this.orderForm.value.usedKilos);
+    if (usedKilos > this.trailerEntry.availableKilos) {
+      this.showAlert(
+        `No puedes usar más de ${this.trailerEntry.availableKilos} kilos disponibles`,
+        false
+      );
       return;
     }
 
@@ -176,6 +232,10 @@ export class ManufacturingOrderFormComponent implements OnInit {
 
     if (control.hasError('min')) {
       return `El valor debe ser mayor que ${control.errors?.['min'].min}`;
+    }
+
+    if (control.hasError('max')) {
+      return `El valor no puede ser mayor que ${control.errors?.['max'].max}`;
     }
 
     return 'Campo inválido';

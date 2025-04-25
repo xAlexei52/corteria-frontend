@@ -213,6 +213,86 @@
             {{ getErrorMessage('kilos') }}
           </p>
         </div>
+
+        <!-- Costo de entrada -->
+        <div>
+          <label
+            for="entryCost"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Costo de Entrada</label
+          >
+          <input
+            type="number"
+            id="entryCost"
+            formControlName="entryCost"
+            placeholder="Costo total de la entrada"
+            min="0"
+            step="0.01"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('entryCost') }"
+          />
+          <p
+            *ngIf="isFieldInvalid('entryCost')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('entryCost') }}
+          </p>
+        </div>
+
+        <!-- ¿Necesita Procesamiento? -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            ¿Necesita Procesamiento? <span class="text-red-500">*</span>
+          </label>
+          <div class="flex items-center space-x-4 mt-2">
+            <label class="inline-flex items-center">
+              <input
+                type="radio"
+                formControlName="needsProcessing"
+                [value]="true"
+                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span class="ml-2 text-gray-700">Sí</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input
+                type="radio"
+                formControlName="needsProcessing"
+                [value]="false"
+                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span class="ml-2 text-gray-700">No, va directo a almacén</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Almacén destino (solo si no necesita procesamiento) -->
+        <div *ngIf="!entryForm.get('needsProcessing')?.value">
+          <label
+            for="targetWarehouseId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Almacén Destino <span class="text-red-500">*</span></label
+          >
+          <select
+            id="targetWarehouseId"
+            formControlName="targetWarehouseId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500': isFieldInvalid('targetWarehouseId')
+            }"
+          >
+            <option value="">Selecciona un almacén</option>
+            <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">
+              {{ warehouse.name }}
+            </option>
+          </select>
+          <p
+            *ngIf="isFieldInvalid('targetWarehouseId')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('targetWarehouseId') }}
+          </p>
+        </div>
       </div>
 
       <!-- Botones de acción -->

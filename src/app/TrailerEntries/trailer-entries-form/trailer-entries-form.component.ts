@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TrailerEntriesService } from 'src/app/_services/TrailerEntry/trailer-entries.service';
 import { ProductsService } from 'src/app/_services/Products/products.service';
+import { WarehousesService } from 'src/app/_services/Warehouses/warehouses.service';
 
 @Component({
   selector: 'app-trailer-entries-form',
@@ -18,11 +19,13 @@ export class TrailerEntriesFormComponent implements OnInit {
   isSuccess: boolean = false;
   isClosing: boolean = false;
   products: any[] = [];
+  warehouses: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private trailerEntriesService: TrailerEntriesService,
     private productsService: ProductsService,
+    private warehousesService: WarehousesService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -34,11 +37,16 @@ export class TrailerEntriesFormComponent implements OnInit {
       kilos: ['', [Validators.required, Validators.min(0.1)]],
       reference: ['', Validators.required],
       city: ['', Validators.required],
+      // Nuevos campos
+      needsProcessing: [true, Validators.required],
+      entryCost: [''],
+      targetWarehouseId: [''],
     });
   }
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadWarehouses();
 
     // Verificar si estamos en modo edición
     this.route.params.subscribe((params) => {
@@ -47,6 +55,19 @@ export class TrailerEntriesFormComponent implements OnInit {
         this.isEditMode = true;
         this.loadEntryData(this.entryId);
       }
+    });
+
+    // Escuchar cambios en el campo needsProcessing para validar targetWarehouseId
+    this.entryForm.get('needsProcessing')?.valueChanges.subscribe((value) => {
+      const targetWarehouseIdControl = this.entryForm.get('targetWarehouseId');
+      if (!value) {
+        // Si no necesita procesamiento, targetWarehouseId es requerido
+        targetWarehouseIdControl?.setValidators([Validators.required]);
+      } else {
+        // Si necesita procesamiento, targetWarehouseId no es requerido
+        targetWarehouseIdControl?.clearValidators();
+      }
+      targetWarehouseIdControl?.updateValueAndValidity();
     });
   }
 
@@ -63,6 +84,22 @@ export class TrailerEntriesFormComponent implements OnInit {
       },
       error: (err) => {
         this.showAlert('Error al cargar productos: ' + err.message, false);
+      },
+    });
+  }
+
+  loadWarehouses(): void {
+    // Cargar almacenes activos
+    this.warehousesService.getWarehouses({ active: true }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.warehouses = response.warehouses;
+        } else {
+          this.showAlert('Error al cargar almacenes', false);
+        }
+      },
+      error: (err) => {
+        this.showAlert('Error al cargar almacenes: ' + err.message, false);
       },
     });
   }
@@ -85,6 +122,10 @@ export class TrailerEntriesFormComponent implements OnInit {
             kilos: response.entry.kilos,
             reference: response.entry.reference,
             city: response.entry.city,
+            // Nuevos campos
+            needsProcessing: response.entry.needsProcessing,
+            entryCost: response.entry.entryCost,
+            targetWarehouseId: response.entry.targetWarehouseId,
           });
         } else {
           this.showAlert('Error al cargar los datos de la entrada', false);
@@ -104,7 +145,13 @@ export class TrailerEntriesFormComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const formData = this.entryForm.value;
+    // Crear una copia de los valores del formulario
+    const formData = { ...this.entryForm.value };
+
+    // Si needsProcessing es true, no debemos enviar targetWarehouseId
+    if (formData.needsProcessing === true) {
+      delete formData.targetWarehouseId;
+    }
 
     if (this.isEditMode) {
       this.trailerEntriesService

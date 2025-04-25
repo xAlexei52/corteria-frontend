@@ -25,6 +25,15 @@ export class TrailerEntriesListComponent implements OnInit {
   showDeleteModal: boolean = false;
   entryToDelete: any = null;
 
+  // Opciones para el filtro de procesamiento
+  processingStatusOptions = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'pending', label: 'Pendiente' },
+    { value: 'partial', label: 'Parcial' },
+    { value: 'completed', label: 'Completado' },
+    { value: 'not_needed', label: 'No requiere' },
+  ];
+
   constructor(
     private trailerEntriesService: TrailerEntriesService,
     private fb: FormBuilder,
@@ -36,6 +45,8 @@ export class TrailerEntriesListComponent implements OnInit {
       city: [''],
       supplier: [''],
       reference: [''],
+      needsProcessing: [''],
+      processingStatus: [''],
     });
   }
 
@@ -100,6 +111,8 @@ export class TrailerEntriesListComponent implements OnInit {
       city: '',
       supplier: '',
       reference: '',
+      needsProcessing: '',
+      processingStatus: '',
     });
     this.currentPage = 1;
     this.loadEntries();
@@ -158,6 +171,22 @@ export class TrailerEntriesListComponent implements OnInit {
   // Ver detalles de una entrada
   viewDetails(id: string): void {
     this.router.navigate([`/trailer-entries/details/${id}`]);
+  }
+
+  // Formatear estado de procesamiento
+  formatProcessingStatus(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'Pendiente';
+      case 'partial':
+        return 'Parcial';
+      case 'completed':
+        return 'Completado';
+      case 'not_needed':
+        return 'No requiere';
+      default:
+        return status;
+    }
   }
 
   // Mostrar alerta

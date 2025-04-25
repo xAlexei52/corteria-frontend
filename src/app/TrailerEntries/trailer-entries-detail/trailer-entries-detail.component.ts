@@ -116,4 +116,20 @@ export class TrailerEntriesDetailComponent implements OnInit {
   createManufacturingOrder(): void {
     this.router.navigate(['/manufacturing-orders/create', this.entryId]);
   }
+
+  // Método para formatear el estado de procesamiento
+  formatProcessingStatus(status: string): string {
+    switch (status) {
+      case 'not_needed':
+        return 'No requiere procesamiento';
+      case 'pending':
+        return 'Pendiente de procesar';
+      case 'partial':
+        return 'Parcialmente procesado';
+      case 'completed':
+        return 'Completamente procesado';
+      default:
+        return status;
+    }
+  }
 }

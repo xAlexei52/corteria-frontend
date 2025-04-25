@@ -30,6 +30,14 @@ export class TrailerEntriesService {
         httpParams = httpParams.set('supplier', params.supplier);
       if (params.productId)
         httpParams = httpParams.set('productId', params.productId);
+      // Nuevos parámetros
+      if (params.needsProcessing !== undefined)
+        httpParams = httpParams.set('needsProcessing', params.needsProcessing);
+      if (params.processingStatus)
+        httpParams = httpParams.set(
+          'processingStatus',
+          params.processingStatus
+        );
     }
 
     return this.http
@@ -78,13 +86,11 @@ export class TrailerEntriesService {
     return throwError(() => new Error(errorMessage));
   }
 
-  getTotalAmount(product?: any){
+  getTotalAmount(product?: any) {
     let httpParams = new HttpParams();
-    httpParams = httpParams.set('productId', product)
-      return this.http
+    httpParams = httpParams.set('productId', product);
+    return this.http
       .get<any>(this.apiUrl, { params: httpParams })
       .pipe(catchError(this.handleError));
   }
-
-
 }

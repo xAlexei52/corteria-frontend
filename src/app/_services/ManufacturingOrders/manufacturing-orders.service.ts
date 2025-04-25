@@ -32,6 +32,12 @@ export class ManufacturingOrdersService {
         httpParams = httpParams.set('endDate', params.endDate);
       if (params.productId)
         httpParams = httpParams.set('productId', params.productId);
+      // Nuevo parámetro
+      if (params.calculationStatus)
+        httpParams = httpParams.set(
+          'calculationStatus',
+          params.calculationStatus
+        );
     }
 
     return this.http
@@ -60,10 +66,24 @@ export class ManufacturingOrdersService {
       .pipe(catchError(this.handleError));
   }
 
-  // Calcular gastos de una orden
-  calculateOrderExpenses(id: string): Observable<any> {
+  // Agregar gastos a una orden
+  addOrderExpenses(id: string, expenses: any[]): Observable<any> {
     return this.http
-      .post<any>(`${this.apiUrl}/${id}/calculate-expenses`, {})
+      .post<any>(`${this.apiUrl}/${id}/expenses`, { expenses })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Agregar subproductos a una orden
+  addOrderSubproducts(id: string, subproducts: any[]): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/${id}/subproducts`, { subproducts })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Calcular costos y rentabilidad de una orden
+  calculateOrderCosts(id: string, calculationData: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/${id}/calculate`, calculationData)
       .pipe(catchError(this.handleError));
   }
 

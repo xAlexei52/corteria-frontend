@@ -103,13 +103,17 @@
           Creada el {{ order.createdAt | date : 'dd/MM/yyyy HH:mm' }}
         </p>
       </div>
-      <div class="flex mt-4 md:mt-0 space-x-3">
+      <div class="flex flex-wrap mt-4 md:mt-0 space-x-2 gap-2">
         <button
-          *ngIf="order.status !== 'completed'"
-          (click)="calculateExpenses()"
-          [disabled]="calculatingExpenses"
-          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
-          [ngClass]="calculatingExpenses ? 'opacity-50 cursor-not-allowed' : ''"
+          *ngIf="order.status !== 'completed' && order.status !== 'cancelled'"
+          (click)="openCostsModal()"
+          [disabled]="!order.expenses || order.expenses.length === 0"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+          [ngClass]="
+            !order.expenses || order.expenses.length === 0
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          "
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -119,34 +123,47 @@
           >
             <path
               fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+              d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 00-1 1v1h8V5a1 1 0 00-1-1H7zm5.5 6a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
               clip-rule="evenodd"
             />
           </svg>
-          <span *ngIf="!calculatingExpenses">Calcular Gastos</span>
-          <span *ngIf="calculatingExpenses" class="flex items-center">
-            <svg
-              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            Calculando...
-          </span>
+          Calcular Costos
+        </button>
+        <button
+          *ngIf="order.status !== 'completed' && order.status !== 'cancelled'"
+          (click)="openExpensesModal()"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Agregar Gasto
+        </button>
+        <button
+          *ngIf="order.status !== 'completed' && order.status !== 'cancelled'"
+          (click)="openSubproductsModal()"
+          class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
+            />
+          </svg>
+          Agregar Subproducto
         </button>
         <button
           (click)="openStatusModal()"
@@ -188,33 +205,61 @@
       </div>
     </div>
 
-    <!-- Estado -->
+    <!-- Estados múltiples -->
     <div class="p-6 bg-gray-50 border-b border-gray-200">
-      <div class="flex items-center">
-        <div
-          class="w-3 h-3 rounded-full mr-2"
-          [ngClass]="{
-            'bg-blue-500': order.status === 'pending',
-            'bg-yellow-500': order.status === 'in_progress',
-            'bg-green-500': order.status === 'completed'
-          }"
-        ></div>
-        <span class="font-medium mr-2">
-          {{ formatStatus(order.status) }}
-        </span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Estado -->
+        <div class="flex items-center">
+          <div
+            class="w-3 h-3 rounded-full mr-2"
+            [ngClass]="{
+              'bg-blue-500': order.status === 'pending',
+              'bg-yellow-500': order.status === 'in_progress',
+              'bg-green-500': order.status === 'completed',
+              'bg-red-500': order.status === 'cancelled'
+            }"
+          ></div>
+          <span class="font-medium mr-2">
+            {{ formatStatus(order.status) }}
+          </span>
 
-        <span
-          *ngIf="order.status === 'in_progress' || order.status === 'completed'"
-          class="text-sm text-gray-600"
-        >
-          - Iniciado: {{ order.startDate | date : 'dd/MM/yyyy HH:mm' }}
-        </span>
-        <span
-          *ngIf="order.status === 'completed'"
-          class="ml-2 text-sm text-gray-600"
-        >
-          - Finalizado: {{ order.endDate | date : 'dd/MM/yyyy HH:mm' }}
-        </span>
+          <span
+            *ngIf="
+              order.status === 'in_progress' || order.status === 'completed'
+            "
+            class="text-sm text-gray-600 ml-2"
+          >
+            - Iniciado: {{ order.startDate | date : 'dd/MM/yyyy HH:mm' }}
+          </span>
+          <span
+            *ngIf="order.status === 'completed'"
+            class="ml-2 text-sm text-gray-600"
+          >
+            - Finalizado: {{ order.endDate | date : 'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <!-- Estado de cálculo -->
+        <div class="flex items-center">
+          <div
+            class="w-3 h-3 rounded-full mr-2"
+            [ngClass]="{
+              'bg-yellow-500': order.calculationStatus === 'pending',
+              'bg-green-500': order.calculationStatus === 'calculated'
+            }"
+          ></div>
+          <span class="font-medium">
+            {{ formatCalculationStatus(order.calculationStatus) }}
+          </span>
+        </div>
+
+        <!-- Datos de producción -->
+        <div class="text-right font-medium">
+          <span class="text-gray-700">
+            Usa {{ order.usedKilos }} kg → Produce
+            {{ order.totalOutputKilos }} kg
+          </span>
+        </div>
       </div>
     </div>
 
@@ -230,9 +275,17 @@
         <!-- Kilos a procesar -->
         <div>
           <h3 class="text-sm font-medium text-gray-500 mb-1">
-            Kilos a Procesar
+            Kilos Utilizados
           </h3>
-          <p class="text-lg">{{ order.kilosToProcess }} kg</p>
+          <p class="text-lg">{{ order.usedKilos }} kg</p>
+        </div>
+
+        <!-- Kilos a producir -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">
+            Kilos a Producir
+          </h3>
+          <p class="text-lg">{{ order.totalOutputKilos }} kg</p>
         </div>
 
         <!-- Cajas estimadas -->
@@ -284,7 +337,7 @@
 
     <!-- Información económica -->
     <div
-      *ngIf="order.totalCost"
+      *ngIf="order.calculationStatus === 'calculated'"
       class="p-6 border-t border-gray-200 bg-gray-50"
     >
       <h3 class="text-lg font-semibold text-gray-800 mb-4">
@@ -295,13 +348,13 @@
         <div>
           <h4 class="text-sm font-medium text-gray-500 mb-1">Costo Total</h4>
           <p class="text-lg font-semibold text-gray-900">
-            ${{ order.totalCost }}
+            {{ order.totalCost | currency }}
           </p>
         </div>
         <div>
           <h4 class="text-sm font-medium text-gray-500 mb-1">Costo por Kilo</h4>
           <p class="text-lg font-semibold text-gray-900">
-            ${{ order.costPerKilo }}
+            {{ order.costPerKilo | currency }}
           </p>
         </div>
         <div>
@@ -309,11 +362,75 @@
             Precio de Venta por Kilo
           </h4>
           <p class="text-lg font-semibold text-gray-900">
-            ${{ order.product?.pricePerKilo }}
+            {{ order.sellingPricePerKilo | currency }}
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Ganancia por Kilo
+          </h4>
+          <p class="text-lg font-semibold text-gray-900">
+            {{ order.profitPerKilo | currency }}
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Porcentaje de Ganancia
+          </h4>
+          <p class="text-lg font-semibold text-gray-900">
+            {{ order.profitPercentage }}%
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Ganancia Total Estimada
+          </h4>
+          <p class="text-lg font-semibold text-gray-900">
+            {{ order.profitPerKilo * order.totalOutputKilos | currency }}
           </p>
         </div>
       </div>
+
+      <!-- Desglose de costos -->
+      <div class="mt-6">
+        <h4 class="text-md font-medium text-gray-700 mb-2">
+          Desglose de Costos:
+        </h4>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="text-xs text-gray-500">Materia Prima</div>
+            <div class="text-lg font-semibold">
+              {{ order.rawMaterialCost | currency }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="text-xs text-gray-500">Insumos</div>
+            <div class="text-lg font-semibold">
+              {{ order.suppliesCost | currency }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="text-xs text-gray-500">Mano de Obra</div>
+            <div class="text-lg font-semibold">
+              {{ order.laborCost | currency }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="text-xs text-gray-500">Empaque</div>
+            <div class="text-lg font-semibold">
+              {{ order.packagingCost | currency }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="text-xs text-gray-500">Gastos Fijos</div>
+            <div class="text-lg font-semibold">
+              {{ order.fixedCost | currency }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
     <!-- Sección de gastos detallados -->
     <div
       *ngIf="order.expenses && order.expenses.length > 0"
@@ -343,7 +460,19 @@
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Detalles
+                Cantidad
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Unidad
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Costo Unitario
               </th>
               <th
                 scope="col"
@@ -359,6 +488,9 @@
                 class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
               >
                 {{ expense.name }}
+                <p *ngIf="expense.notes" class="text-xs text-gray-500">
+                  {{ expense.notes }}
+                </p>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <span
@@ -366,56 +498,132 @@
                     'px-2 py-1 rounded-full text-xs': true,
                     'bg-blue-100 text-blue-800': expense.type === 'supply',
                     'bg-green-100 text-green-800': expense.type === 'fixed',
-                    'bg-purple-100 text-purple-800': expense.type === 'other'
+                    'bg-yellow-100 text-yellow-800':
+                      expense.type === 'variable',
+                    'bg-purple-100 text-purple-800':
+                      expense.type === 'packaging',
+                    'bg-red-100 text-red-800': expense.type === 'labor'
                   }"
                 >
-                  {{
-                    expense.type === 'supply'
-                      ? 'Insumo'
-                      : expense.type === 'fixed'
-                      ? 'Gasto Fijo'
-                      : 'Otro'
-                  }}
+                  {{ formatExpenseType(expense.type) }}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ expense.notes }}
+                {{ expense.quantity || '-' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                {{ expense.unit || '-' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-right text-gray-500">
+                {{
+                  expense.costPerUnit ? (expense.costPerUnit | currency) : '-'
+                }}
               </td>
               <td
                 class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900"
               >
-                ${{ expense.amount }}
+                {{ expense.amount | currency }}
               </td>
             </tr>
           </tbody>
           <tfoot>
             <tr class="bg-gray-100">
               <td
-                colspan="3"
+                colspan="5"
                 class="px-6 py-3 text-right text-sm font-bold text-gray-900"
               >
-                COSTO TOTAL:
+                TOTAL:
               </td>
               <td
                 class="px-6 py-3 whitespace-nowrap text-sm font-bold text-right text-gray-900"
               >
-                ${{ order.totalCost }}
-              </td>
-            </tr>
-            <tr class="bg-gray-50">
-              <td
-                colspan="3"
-                class="px-6 py-3 text-right text-sm font-medium text-gray-700"
-              >
-                Costo por kilo:
-              </td>
-              <td
-                class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-700"
-              >
-                ${{ order.costPerKilo }}
+                {{ calculateTotalExpenses() | currency }}
               </td>
             </tr>
           </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sección de subproductos -->
+    <div
+      *ngIf="order.subproducts && order.subproducts.length > 0"
+      class="p-6 border-t border-gray-200"
+    >
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">Subproductos</h3>
+
+      <div class="bg-white shadow overflow-hidden rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Nombre
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Cantidad
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Unidad
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Costo Unitario
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Costo Total
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr
+              *ngFor="let subproduct of order.subproducts"
+              class="hover:bg-gray-50"
+            >
+              <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                {{ subproduct.name }}
+                <p *ngIf="subproduct.product" class="text-xs text-blue-600">
+                  (Producto registrado)
+                </p>
+                <p *ngIf="subproduct.notes" class="text-xs text-gray-500">
+                  {{ subproduct.notes }}
+                </p>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                {{ subproduct.quantity }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                {{ subproduct.unit }}
+              </td>
+              <td class="px-6 py-4 text-sm text-right text-gray-500">
+                {{
+                  subproduct.costPerUnit
+                    ? (subproduct.costPerUnit | currency)
+                    : '-'
+                }}
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900"
+              >
+                {{
+                  subproduct.totalCost ? (subproduct.totalCost | currency) : '-'
+                }}
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -583,6 +791,479 @@
           "
         >
           <span *ngIf="!isLoading">Guardar Cambios</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para agregar gastos -->
+<div
+  *ngIf="showExpensesModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-center text-green-600 mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-12 w-12"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
+      Agregar Gasto
+    </h3>
+
+    <form [formGroup]="expensesForm" (ngSubmit)="addExpenses()">
+      <div class="mb-4">
+        <label for="type" class="block text-sm font-medium text-gray-700 mb-1"
+          >Tipo de Gasto <span class="text-red-500">*</span></label
+        >
+        <select
+          id="type"
+          formControlName="type"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option
+            *ngFor="let option of expenseTypeOptions"
+            [value]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div *ngIf="expensesForm.get('type')?.value === 'supply'">
+        <div class="mb-4">
+          <label
+            for="supplyId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Insumo <span class="text-red-500">*</span></label
+          >
+          <select
+            id="supplyId"
+            formControlName="supplyId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Seleccione un insumo</option>
+            <option *ngFor="let supply of supplies" [value]="supply.id">
+              {{ supply.name }} ({{ supply.unit }})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="expensesForm.get('type')?.value !== 'supply'">
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+            >Nombre <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Nombre del gasto"
+          />
+        </div>
+      </div>
+
+      <div
+        *ngIf="
+          expensesForm.get('type')?.value !== 'labor' &&
+          expensesForm.get('type')?.value !== 'fixed'
+        "
+        class="mb-4"
+      >
+        <label
+          for="quantity"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Cantidad <span class="text-red-500">*</span></label
+        >
+        <input
+          type="number"
+          id="quantity"
+          formControlName="quantity"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Cantidad"
+        />
+      </div>
+
+      <div
+        *ngIf="
+          expensesForm.get('type')?.value !== 'labor' &&
+          expensesForm.get('type')?.value !== 'fixed'
+        "
+        class="mb-4"
+      >
+        <label for="unit" class="block text-sm font-medium text-gray-700 mb-1"
+          >Unidad</label
+        >
+        <input
+          type="text"
+          id="unit"
+          formControlName="unit"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Unidad (kg, g, l, pieza, etc.)"
+        />
+      </div>
+
+      <div
+        *ngIf="
+          expensesForm.get('type')?.value !== 'labor' &&
+          expensesForm.get('type')?.value !== 'fixed'
+        "
+        class="mb-4"
+      >
+        <label
+          for="costPerUnit"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Costo por Unidad</label
+        >
+        <input
+          type="number"
+          id="costPerUnit"
+          formControlName="costPerUnit"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Costo por unidad"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1"
+          >Monto Total <span class="text-red-500">*</span></label
+        >
+        <input
+          type="number"
+          id="amount"
+          formControlName="amount"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Monto total"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1"
+          >Notas</label
+        >
+        <textarea
+          id="notes"
+          formControlName="notes"
+          rows="2"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Notas adicionales"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-center space-x-4 mt-6">
+        <button
+          type="button"
+          (click)="cancelExpenses()"
+          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="expensesForm.invalid || isLoading"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+          [ngClass]="
+            expensesForm.invalid || isLoading
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          "
+        >
+          <span *ngIf="!isLoading">Agregar Gasto</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para agregar subproductos -->
+<div
+  *ngIf="showSubproductsModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-center text-purple-600 mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-12 w-12"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
+        />
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
+      Agregar Subproducto
+    </h3>
+
+    <form [formGroup]="subproductsForm" (ngSubmit)="addSubproducts()">
+      <div class="mb-4">
+        <label
+          for="productId"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Producto Registrado (opcional)</label
+        >
+        <select
+          id="productId"
+          formControlName="productId"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Producto no registrado</option>
+          <option *ngFor="let product of products" [value]="product.id">
+            {{ product.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+          >Nombre <span class="text-red-500">*</span></label
+        >
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Nombre del subproducto"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="quantity"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Cantidad <span class="text-red-500">*</span></label
+        >
+        <input
+          type="number"
+          id="quantity"
+          formControlName="quantity"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Cantidad producida"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="unit" class="block text-sm font-medium text-gray-700 mb-1"
+          >Unidad <span class="text-red-500">*</span></label
+        >
+        <input
+          type="text"
+          id="unit"
+          formControlName="unit"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Unidad (kg, g, l, pieza, etc.)"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="costPerUnit"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Costo por Unidad (opcional)</label
+        >
+        <input
+          type="number"
+          id="costPerUnit"
+          formControlName="costPerUnit"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Costo por unidad"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="subNotes"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Notas</label
+        >
+        <textarea
+          id="subNotes"
+          formControlName="notes"
+          rows="2"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Notas adicionales"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-center space-x-4 mt-6">
+        <button
+          type="button"
+          (click)="cancelSubproducts()"
+          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="subproductsForm.invalid || isLoading"
+          class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center"
+          [ngClass]="
+            subproductsForm.invalid || isLoading
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          "
+        >
+          <span *ngIf="!isLoading">Agregar Subproducto</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para calcular costos -->
+<div
+  *ngIf="showCostsModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-center text-indigo-600 mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-12 w-12"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 00-1 1v1h8V5a1 1 0 00-1-1H7zm5.5 6a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
+      Calcular Costos y Rentabilidad
+    </h3>
+
+    <form [formGroup]="costsForm" (ngSubmit)="calculateCosts()">
+      <div class="mb-4">
+        <label
+          for="sellingPricePerKilo"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Precio de Venta por Kilo <span class="text-red-500">*</span></label
+        >
+        <input
+          type="number"
+          id="sellingPricePerKilo"
+          formControlName="sellingPricePerKilo"
+          min="0.01"
+          step="0.01"
+          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Precio de venta por kilo"
+        />
+      </div>
+
+      <div class="flex justify-center space-x-4 mt-6">
+        <button
+          type="button"
+          (click)="cancelCosts()"
+          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="costsForm.invalid || isLoading"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+          [ngClass]="
+            costsForm.invalid || isLoading
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          "
+        >
+          <span *ngIf="!isLoading">Calcular</span>
           <span *ngIf="isLoading" class="flex items-center">
             <svg
               class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"

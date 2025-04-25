@@ -241,7 +241,6 @@ export class SaleFormComponent implements OnInit {
   onProductSelect(index: number): void {
     const productGroup = this.productsArray.at(index) as FormGroup;
     const productId = productGroup.get('productId')?.value;
-  
 
     if (productId) {
       const selectedProduct = this.products.find((p) => p.id === productId);
@@ -286,7 +285,6 @@ export class SaleFormComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    
     if (this.isEditMode) {
       // No implementamos la edición de ventas ya que puede ser compleja
       // debido a cambios en inventario, pagos, etc.
@@ -300,8 +298,8 @@ export class SaleFormComponent implements OnInit {
             this.showAlert('Venta creada exitosamente', true);
             setTimeout(() => {
               this.router.navigate(['/sales/details', response.sale.id]);
-            }, 1500); 
-          }else {
+            }, 1500);
+          } else {
             this.showAlert(
               'Error al crear la venta: ' + response.message,
               false
@@ -310,8 +308,8 @@ export class SaleFormComponent implements OnInit {
         },
         error: (err) => {
           saleData.products.forEach((e: any) => {
-            this.loadEntries(e.productId, e.quantity)
-          }); 
+            this.loadEntries(e.productId, e.quantity);
+          });
           this.isSubmitting = false;
           this.showAlert('Error al crear la venta: ' + err.message, false);
         },
@@ -356,22 +354,24 @@ export class SaleFormComponent implements OnInit {
   loadEntries(product: any, productQuantity: any): void {
     this.trailerEntriesService.getTotalAmount(product).subscribe({
       next: (response) => {
-        if(response.success){
+        if (response.success) {
           this.entries = response.entries;
           this.entries.forEach((e) => {
             if (e.product.id == product) {
-              this.helper += parseFloat(e.kilos)
+              this.helper += parseFloat(e.kilos);
             }
-            console.log(productQuantity)
-            if (this.helper < productQuantity){
-              this.showAlert('Error al crear la venta: El pedido sobrepasa el total de kilos registrado... ' + this.helper + " Kilos disponibles para este producto"  , false);
+            console.log(productQuantity);
+            if (this.helper < productQuantity) {
+              this.showAlert(
+                'Error al crear la venta: El pedido sobrepasa el total de kilos registrado... ' +
+                  this.helper +
+                  ' Kilos disponibles para este producto',
+                false
+              );
             }
-          })
+          });
         }
-      }
-    })
+      },
+    });
   }
-
 }
-
-
