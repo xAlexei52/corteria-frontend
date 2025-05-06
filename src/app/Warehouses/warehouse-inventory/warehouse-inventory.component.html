@@ -1,0 +1,625 @@
+<!-- src/app/Warehouses/warehouse-inventory/warehouse-inventory.component.html (continuación) -->
+<!-- src/app/Warehouses/warehouse-inventory/warehouse-inventory.component.html -->
+
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Inventario del Almacén</h1>
+      <p *ngIf="warehouse" class="text-gray-600">
+        {{ warehouse.name }} - {{ warehouse.city }}
+      </p>
+    </div>
+    <div class="flex space-x-3 mt-3 md:mt-0">
+      <button
+        (click)="goBack()"
+        class="text-gray-700 px-4 py-2 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Volver a la lista
+      </button>
+      <button
+        (click)="openTransferModal()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z"
+          />
+        </svg>
+        Transferir
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Filtros de inventario -->
+  <div *ngIf="!isLoading" class="bg-white rounded-xl shadow p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4">Filtros</h2>
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label
+            for="itemType"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Tipo de Ítem</label
+          >
+          <select
+            id="itemType"
+            formControlName="itemType"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="product">Productos</option>
+            <option value="supply">Insumos</option>
+          </select>
+        </div>
+        <div>
+          <label
+            for="search"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Buscar</label
+          >
+          <input
+            type="text"
+            id="search"
+            formControlName="search"
+            placeholder="Nombre del ítem..."
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="flex items-end">
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Aplicar Filtros
+          </button>
+          <button
+            type="button"
+            (click)="resetFilters()"
+            class="ml-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de inventario -->
+  <div *ngIf="!isLoading" class="bg-white rounded-xl shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Ítem
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Tipo
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Cantidad
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Última Actualización
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <!-- Sin resultados -->
+          <tr *ngIf="inventory.length === 0">
+            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+              No hay items en el inventario con los filtros seleccionados.
+            </td>
+          </tr>
+
+          <!-- Lista de inventario -->
+          <tr *ngFor="let item of inventory" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{
+                  item.itemType === 'product'
+                    ? item.product?.name || 'Producto no disponible'
+                    : item.supply?.name || 'Insumo no disponible'
+                }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ getItemDetails(item) }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span
+                class="px-2 py-1 rounded-full text-xs"
+                [ngClass]="
+                  item.itemType === 'product'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                "
+              >
+                {{ item.itemType === 'product' ? 'Producto' : 'Insumo' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ item.quantity }}
+              {{ item.itemType === 'product' ? 'kg' : item.supply?.unit || '' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ item.updatedAt | date : 'dd/MM/yyyy HH:mm' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div
+      class="px-6 py-4 flex items-center justify-between border-t border-gray-200 bg-gray-50"
+    >
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button
+          [disabled]="currentPage === 1"
+          (click)="onPageChange(currentPage - 1)"
+          [ngClass]="currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Anterior
+        </button>
+        <button
+          [disabled]="currentPage === totalPages"
+          (click)="onPageChange(currentPage + 1)"
+          [ngClass]="
+            currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''
+          "
+          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Siguiente
+        </button>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Mostrando
+            <span class="font-medium">{{
+              (currentPage - 1) * itemsPerPage + 1
+            }}</span>
+            a
+            <span class="font-medium">
+              {{
+                currentPage * itemsPerPage > totalItems
+                  ? totalItems
+                  : currentPage * itemsPerPage
+              }}
+            </span>
+            de <span class="font-medium">{{ totalItems }}</span> resultados
+          </p>
+        </div>
+        <div>
+          <nav
+            class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+            aria-label="Pagination"
+            *ngIf="totalPages > 0"
+          >
+            <button
+              [disabled]="currentPage === 1"
+              (click)="onPageChange(1)"
+              [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Inicio</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+            <button
+              [disabled]="currentPage === 1"
+              (click)="onPageChange(currentPage - 1)"
+              [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Anterior</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+
+            <!-- Páginas -->
+            <ng-container
+              *ngFor="let page of [].constructor(totalPages); let i = index"
+            >
+              <button
+                (click)="onPageChange(i + 1)"
+                class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                [ngClass]="
+                  currentPage === i + 1
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                "
+              >
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+
+            <button
+              [disabled]="currentPage === totalPages"
+              (click)="onPageChange(currentPage + 1)"
+              [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Siguiente</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+            <button
+              [disabled]="currentPage === totalPages"
+              (click)="onPageChange(totalPages)"
+              [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Fin</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de transferencia -->
+<div
+  *ngIf="showTransferModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-gray-900">Transferir Inventario</h2>
+      <button
+        (click)="closeTransferModal()"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="transferForm" (ngSubmit)="onTransferSubmit()">
+      <div class="space-y-4">
+        <!-- Almacén origen (deshabilitado, es el actual) -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Almacén Origen</label
+          >
+          <input
+            type="text"
+            [value]="warehouse?.name || ''"
+            class="w-full p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700"
+            disabled
+          />
+        </div>
+
+        <!-- Almacén destino -->
+        <div>
+          <label
+            for="destinationWarehouseId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Almacén Destino <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="destinationWarehouseId"
+            formControlName="destinationWarehouseId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                transferForm.get('destinationWarehouseId')?.invalid &&
+                transferForm.get('destinationWarehouseId')?.touched
+            }"
+          >
+            <option value="">Seleccionar almacén destino</option>
+            <option
+              *ngFor="let warehouse of warehousesList"
+              [value]="warehouse.id"
+            >
+              {{ warehouse.name }} ({{ warehouse.city }})
+            </option>
+          </select>
+          <div
+            *ngIf="
+              transferForm.get('destinationWarehouseId')?.invalid &&
+              transferForm.get('destinationWarehouseId')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            Seleccione un almacén destino
+          </div>
+        </div>
+
+        <!-- Tipo de ítem -->
+        <div>
+          <label
+            for="transferItemType"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Tipo de Ítem <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="transferItemType"
+            formControlName="itemType"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="product">Producto</option>
+            <option value="supply">Insumo</option>
+          </select>
+        </div>
+
+        <!-- Producto/Insumo -->
+        <div>
+          <label
+            for="itemId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Producto <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="itemId"
+            formControlName="itemId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                transferForm.get('itemId')?.invalid &&
+                transferForm.get('itemId')?.touched
+            }"
+          >
+            <option value="">Seleccionar producto</option>
+            <option *ngFor="let product of productsList" [value]="product.id">
+              {{ product.name }} ({{ product.pricePerKilo }} $/kg)
+            </option>
+          </select>
+          <div
+            *ngIf="
+              transferForm.get('itemId')?.invalid &&
+              transferForm.get('itemId')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            Seleccione un producto
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div>
+          <label
+            for="quantity"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Cantidad <span class="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="quantity"
+            formControlName="quantity"
+            min="0.1"
+            step="0.1"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{
+              'border-red-500':
+                transferForm.get('quantity')?.invalid &&
+                transferForm.get('quantity')?.touched
+            }"
+            placeholder="Cantidad a transferir"
+          />
+          <div
+            *ngIf="
+              transferForm.get('quantity')?.invalid &&
+              transferForm.get('quantity')?.touched
+            "
+            class="text-red-500 text-sm mt-1"
+          >
+            <div *ngIf="transferForm.get('quantity')?.errors?.['required']">
+              La cantidad es requerida
+            </div>
+            <div *ngIf="transferForm.get('quantity')?.errors?.['min']">
+              La cantidad debe ser mayor a 0
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end space-x-3">
+        <button
+          type="button"
+          (click)="closeTransferModal()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="transferForm.invalid || isTransferring"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{
+            'opacity-50 cursor-not-allowed':
+              transferForm.invalid || isTransferring
+          }"
+        >
+          <span *ngIf="!isTransferring">Transferir</span>
+          <span *ngIf="isTransferring" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

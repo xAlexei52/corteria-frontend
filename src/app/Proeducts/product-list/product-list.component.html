@@ -109,6 +109,13 @@
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
+              Costo (kg)
+            </th>
+
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Estado
             </th>
             <th
@@ -173,6 +180,11 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               ${{ product.pricePerKilo }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{
+                product.costPerKilo ? '$' + product.costPerKilo : 'No definido'
+              }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
               <span
