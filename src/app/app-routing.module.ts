@@ -47,6 +47,8 @@ import { ProjectExpenseFormComponent } from './Projects/project-expense-form/pro
 import { ProjectIncomeListComponent } from './Projects/project-income-list/project-income-list.component';
 import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
 import { RoleGuard } from './_services/AuthService/role.guard';
+import { WarehouseListComponent } from './Warehouses/warehouse-list/warehouse-list.component';
+import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/warehouse-inventory.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -57,7 +59,7 @@ const routes: Routes = [
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['admin','user','manager'] },
+    data: { roles: ['admin', 'user', 'manager'] },
     children: [
       { path: 'home', component: HomeComponent },
       {
@@ -185,6 +187,13 @@ const routes: Routes = [
           },
           { path: 'incomes/edit/:id', component: ProjectIncomeFormComponent },
           { path: '', redirectTo: 'list', pathMatch: 'full' },
+        ],
+      },
+      {
+        path: 'warehouses',
+        children: [
+          { path: '', component: WarehouseListComponent },
+          { path: 'inventory/:id', component: WarehouseInventoryComponent },
         ],
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },

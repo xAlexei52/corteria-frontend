@@ -246,39 +246,6 @@ export class SaleFormComponent implements OnInit {
     this.router.navigate(['/sales/list']);
   }
 
-  private isQuantityValid(): boolean {
-    for (let i = 0; i < this.productsArray.length; i++) {
-      const group = this.productsArray.at(i) as FormGroup;
-      const productId = group.get('productId')?.value;
-      const quantity = parseFloat(group.get('quantity')?.value);
-      const warehouseId = group.get('warehouseId')?.value;
-
-      const inventoryItem = this.inventory.find(
-        (item) => item.itemId === productId
-      );
-
-      if (!inventoryItem) {
-        this.showAlert(
-          `No se encontró inventario para el producto seleccionado`,
-          false
-        );
-        return false;
-      }
-
-      const available = parseFloat(inventoryItem.quantity);
-
-      if (quantity > available) {
-        this.showAlert(
-          `La cantidad (${quantity} kg) del producto excede el inventario disponible (${available} kg).`,
-          false
-        );
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   onSubmit(): void {
     if (this.saleForm.invalid) {
       this.markFormGroupTouched(this.saleForm);
@@ -288,10 +255,6 @@ export class SaleFormComponent implements OnInit {
 
     if (this.productsArray.length === 0) {
       this.showAlert('Debe agregar al menos un producto', false);
-      return;
-    }
-
-    if (!this.isQuantityValid()) {
       return;
     }
 

@@ -54,6 +54,8 @@ import { ProjectExpenseListComponent } from './Projects/project-expense-list/pro
 import { ProjectExpenseFormComponent } from './Projects/project-expense-form/project-expense-form.component';
 import { ProjectIncomeListComponent } from './Projects/project-income-list/project-income-list.component';
 import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
+import { WarehouseListComponent } from './Warehouses/warehouse-list/warehouse-list.component';
+import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/warehouse-inventory.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +106,8 @@ import { ProjectIncomeFormComponent } from './Projects/project-income-form/proje
     ProjectExpenseFormComponent,
     ProjectIncomeListComponent,
     ProjectIncomeFormComponent,
+    WarehouseListComponent,
+    WarehouseInventoryComponent,
   ],
   imports: [
     BrowserModule,

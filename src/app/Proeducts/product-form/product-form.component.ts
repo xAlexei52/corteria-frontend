@@ -39,11 +39,13 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  // Modificación de src/app/Proeducts/product-form/product-form.component.ts
   createForm(): void {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
       pricePerKilo: ['', [Validators.required, Validators.min(0.01)]],
+      costPerKilo: ['', [Validators.min(0.01)]], // Nuevo campo
     });
   }
 
@@ -57,6 +59,7 @@ export class ProductFormComponent implements OnInit {
             name: response.product.name,
             description: response.product.description,
             pricePerKilo: response.product.pricePerKilo,
+            costPerKilo: response.product.costPerKilo, // Agregar campo nuevo
           });
         } else {
           this.showAlert('Error al cargar los datos del producto', false);

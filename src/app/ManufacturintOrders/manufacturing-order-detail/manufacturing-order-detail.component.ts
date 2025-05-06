@@ -209,7 +209,8 @@ export class ManufacturingOrderDetailComponent implements OnInit {
             this.selectedProduct = product;
             this.subproductsForm.patchValue({
               name: product.name,
-              costPerUnit: product.pricePerKilo,
+              costPerUnit: product.pricePerKilo || product.costPerKilo || '', // Usar precio de venta o costo si está disponible
+              unit: 'kg', // Asumimos que los productos se miden en kg
             });
           }
         } else {
@@ -509,7 +510,6 @@ export class ManufacturingOrderDetailComponent implements OnInit {
       });
   }
 
-  // Abrir modal para calcular costos
   openCostsModal(): void {
     // Si ya hay un precio de venta, usarlo
     if (this.order.sellingPricePerKilo) {
@@ -517,10 +517,13 @@ export class ManufacturingOrderDetailComponent implements OnInit {
         sellingPricePerKilo: this.order.sellingPricePerKilo,
       });
     } else if (this.order.product?.pricePerKilo) {
-      // Si no hay precio de venta pero el producto tiene uno
+      // Si no hay precio de venta pero el producto tiene uno, usarlo automáticamente
       this.costsForm.patchValue({
         sellingPricePerKilo: this.order.product.pricePerKilo,
       });
+
+      // Informar al usuario que se está usando el precio del producto
+      this.showAlert('Usando precio de venta del producto por defecto', true);
     } else {
       this.costsForm.reset();
     }
@@ -541,6 +544,13 @@ export class ManufacturingOrderDetailComponent implements OnInit {
     this.isLoading = true;
     const calculationData = this.costsForm.value;
 
+    // Verificar si estamos usando el precio del producto
+    const usingProductPrice =
+      this.order.product &&
+      this.order.product.pricePerKilo &&
+      parseFloat(calculationData.sellingPricePerKilo) ===
+        parseFloat(this.order.product.pricePerKilo);
+
     this.manufacturingOrdersService
       .calculateOrderCosts(this.orderId, calculationData)
       .subscribe({
@@ -548,7 +558,10 @@ export class ManufacturingOrderDetailComponent implements OnInit {
           this.isLoading = false;
           this.showCostsModal = false;
           if (response.success) {
-            this.showAlert('Costos calculados correctamente', true);
+            const message = usingProductPrice
+              ? 'Costos calculados usando el precio de venta del producto'
+              : 'Costos calculados correctamente';
+            this.showAlert(message, true);
             this.loadOrderData(); // Recargar datos
           } else {
             this.showAlert('Error al calcular los costos', false);

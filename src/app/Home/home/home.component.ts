@@ -1,4 +1,5 @@
-// src/app/dashboard/dashboard.component.ts
+// src/app/Home/home/home.component.ts (completo)
+
 import { Component, OnInit } from '@angular/core';
 import { DashboardService } from 'src/app/_services/Dashboard/dashboard.service';
 import { Chart, registerables } from 'chart.js';
@@ -21,6 +22,11 @@ export class HomeComponent implements OnInit {
 
   // Graficos
   salesChart: any;
+  profitChart: any;
+  inventoryChart: any;
+
+  // Pestaña activa en análisis de producción
+  activeProductionTab: string = 'profit';
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -55,6 +61,8 @@ export class HomeComponent implements OnInit {
    */
   initCharts(): void {
     this.initSalesChart();
+    this.initProfitChart();
+    this.initInventoryChart();
   }
 
   /**
@@ -121,6 +129,178 @@ export class HomeComponent implements OnInit {
         },
       },
     });
+  }
+
+  /**
+   * Inicializa el gráfico de rentabilidad de producción
+   */
+  initProfitChart(): void {
+    if (!this.dashboardData?.manufacturingProfit) return;
+
+    const ctx = document.getElementById('profitChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    const profitData = this.dashboardData.manufacturingProfit.summary;
+
+    const data = {
+      labels: [
+        'Costo Materia Prima',
+        'Costo Procesamiento',
+        'Valor Producción',
+        'Ganancia',
+      ],
+      datasets: [
+        {
+          label: 'Análisis de Producción (MXN)',
+          data: [
+            profitData.totalRawMaterialCost,
+            profitData.totalProcessingCost,
+            profitData.totalProductionValue,
+            profitData.totalProfit,
+          ],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    this.profitChart = new Chart(ctx, {
+      type: 'bar',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Análisis de Producción',
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return '$' + context.parsed.y.toLocaleString();
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function (value) {
+                return '$' + value.toLocaleString();
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Inicializa el gráfico de inventario
+   */
+  initInventoryChart(): void {
+    if (!this.dashboardData?.inventoryStats) return;
+
+    const ctx = document.getElementById('inventoryChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    const stats = this.dashboardData.inventoryStats;
+    const productQty = stats.inventoryByType.product?.totalQuantity || 0;
+    const supplyQty = stats.inventoryByType.supply?.totalQuantity || 0;
+
+    this.inventoryChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Productos (kg)', 'Insumos (u)'],
+        datasets: [
+          {
+            data: [productQty, supplyQty],
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 205, 86, 0.7)',
+            ],
+            borderColor: ['rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+          title: {
+            display: true,
+            text: 'Distribución de Inventario',
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return (
+                  label +
+                  ': ' +
+                  value.toLocaleString() +
+                  (context.dataIndex === 0 ? ' kg' : ' unidades')
+                );
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Cambia la pestaña activa en el análisis de producción
+   */
+  setProductionTab(tab: string): void {
+    this.activeProductionTab = tab;
+  }
+
+  /**
+   * Obtiene el rendimiento de producción (ratio salida/entrada)
+   */
+  getProductionYield(): number {
+    if (!this.dashboardData?.manufacturingProfit?.summary) return 0;
+    return (
+      this.dashboardData.manufacturingProfit.summary.avgYieldPercentage || 0
+    );
+  }
+
+  /**
+   * Obtiene el margen de ganancia promedio
+   */
+  getAvgProfitMargin(): number {
+    if (!this.dashboardData?.manufacturingProfit?.summary) return 0;
+    return (
+      this.dashboardData.manufacturingProfit.summary.avgProfitPercentage || 0
+    );
+  }
+
+  /**
+   * Obtiene el valor total del inventario
+   */
+  getTotalInventoryValue(): number {
+    if (!this.dashboardData?.inventoryStats) return 0;
+    return this.dashboardData.inventoryStats.totalProductValue || 0;
   }
 
   /**

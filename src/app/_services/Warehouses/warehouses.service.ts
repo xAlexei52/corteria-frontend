@@ -1,4 +1,5 @@
-// warehouses.service.ts
+// src/app/_services/Warehouses/warehouses.service.ts (actualizado)
+
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
@@ -29,10 +30,53 @@ export class WarehousesService {
         httpParams = httpParams.set('isMain', params.isMain);
       if (params.page) httpParams = httpParams.set('page', params.page);
       if (params.limit) httpParams = httpParams.set('limit', params.limit);
+      if (params.search) httpParams = httpParams.set('search', params.search);
     }
 
     return this.http
       .get<any>(this.apiUrl, { params: httpParams })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener un almacén por ID
+  getWarehouseById(id: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Crear un nuevo almacén
+  createWarehouse(warehouseData: any): Observable<any> {
+    return this.http
+      .post<any>(this.apiUrl, warehouseData)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Actualizar un almacén existente
+  updateWarehouse(id: string, warehouseData: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/${id}`, warehouseData)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Eliminar un almacén
+  deleteWarehouse(id: string): Observable<any> {
+    return this.http
+      .delete<any>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener los almacenes por ciudad
+  getWarehousesByCity(city: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/by-city/${city}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener el almacén principal de una ciudad
+  getMainWarehouseByCity(city: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/main/${city}`)
       .pipe(catchError(this.handleError));
   }
 
