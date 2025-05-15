@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from 'src/app/_services/Users/users.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -21,6 +22,7 @@ export class UserEditComponent implements OnInit {
   alertMessage: string = '';
   isSuccess: boolean = false;
   isClosing: boolean = false;
+  cities: any[] = [];
 
   roleOptions = [
     { value: 'admin', label: 'Administrador' },
@@ -28,20 +30,16 @@ export class UserEditComponent implements OnInit {
     { value: 'user', label: 'Usuario' },
   ];
 
-  cityOptions = [
-    { value: 'Guadalajara', label: 'Guadalajara' },
-    { value: 'Ciudad de México', label: 'Ciudad de México' },
-    { value: 'Monterrey', label: 'Monterrey' },
-  ];
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private usersService: UsersService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cityService: CityService
   ) {}
 
   ngOnInit(): void {
+    this.loadCities();
     // Inicializar el formulario
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -65,6 +63,20 @@ export class UserEditComponent implements OnInit {
     });
   }
 
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar las ciudades', false);
+        }
+      },
+      error: (err) => {
+        this.showAlert('Error al cargar las ciudades: ' + err.message, false);
+      },
+    });
+  }
   loadUserDetails(): void {
     this.isLoading = true;
     this.usersService.getUserById(this.userId).subscribe({

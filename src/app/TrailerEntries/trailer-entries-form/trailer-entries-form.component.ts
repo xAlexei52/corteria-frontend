@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TrailerEntriesService } from 'src/app/_services/TrailerEntry/trailer-entries.service';
 import { ProductsService } from 'src/app/_services/Products/products.service';
 import { WarehousesService } from 'src/app/_services/Warehouses/warehouses.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-trailer-entries-form',
@@ -20,6 +21,7 @@ export class TrailerEntriesFormComponent implements OnInit {
   isClosing: boolean = false;
   products: any[] = [];
   warehouses: any[] = [];
+  cities: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -27,7 +29,8 @@ export class TrailerEntriesFormComponent implements OnInit {
     private productsService: ProductsService,
     private warehousesService: WarehousesService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cityService: CityService
   ) {
     this.entryForm = this.fb.group({
       date: [new Date().toISOString().slice(0, 16), Validators.required],
@@ -36,7 +39,7 @@ export class TrailerEntriesFormComponent implements OnInit {
       boxes: ['', [Validators.required, Validators.min(1)]],
       kilos: ['', [Validators.required, Validators.min(0.1)]],
       reference: ['', Validators.required],
-      city: ['', Validators.required],
+      cityId: ['', Validators.required],
       // Nuevos campos
       needsProcessing: [true, Validators.required],
       entryCost: [''],
@@ -47,6 +50,7 @@ export class TrailerEntriesFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadWarehouses();
+    this.loadCities();
 
     // Verificar si estamos en modo edición
     this.route.params.subscribe((params) => {
@@ -68,6 +72,21 @@ export class TrailerEntriesFormComponent implements OnInit {
         targetWarehouseIdControl?.clearValidators();
       }
       targetWarehouseIdControl?.updateValueAndValidity();
+    });
+  }
+
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar ciudades', false);
+        }
+      },
+      error: (err) => {
+        this.showAlert('Error al cargar ciudades: ' + err.message, false);
+      },
     });
   }
 
@@ -121,7 +140,7 @@ export class TrailerEntriesFormComponent implements OnInit {
             boxes: response.entry.boxes,
             kilos: response.entry.kilos,
             reference: response.entry.reference,
-            city: response.entry.city,
+            cityId: response.entry.cityId,
             // Nuevos campos
             needsProcessing: response.entry.needsProcessing,
             entryCost: response.entry.entryCost,

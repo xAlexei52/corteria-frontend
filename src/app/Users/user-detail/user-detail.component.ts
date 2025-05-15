@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from 'src/app/_services/Users/users.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -21,29 +22,27 @@ export class UserDetailComponent implements OnInit {
   isSuccess: boolean = false;
   isClosing: boolean = false;
 
+  cities: any[] = [];
+
   roleOptions = [
     { value: 'admin', label: 'Administrador' },
     { value: 'manager', label: 'Gerente' },
     { value: 'user', label: 'Usuario' },
   ];
 
-  cityOptions = [
-    { value: 'Guadalajara', label: 'Guadalajara' },
-    { value: 'Ciudad de México', label: 'Ciudad de México' },
-    { value: 'Monterrey', label: 'Monterrey' },
-  ];
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private usersService: UsersService,
+    private cityService: CityService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.loadCities();
     this.permissionsForm = this.fb.group({
       role: ['', Validators.required],
-      city: [''],
+      cityId: [''],
     });
 
     this.route.paramMap.subscribe((params) => {
@@ -57,6 +56,18 @@ export class UserDetailComponent implements OnInit {
     });
   }
 
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar las ciudades', false);
+        }
+      },
+    });
+  }
+
   loadUserDetails(): void {
     this.isLoading = true;
     this.usersService.getUserById(this.userId).subscribe({
@@ -65,7 +76,7 @@ export class UserDetailComponent implements OnInit {
           this.user = response.user;
           this.permissionsForm.patchValue({
             role: this.user.role,
-            city: this.user.city || '',
+            cityId: this.user.city || '',
           });
         } else {
           this.showAlert('Error al cargar los detalles del usuario', false);
@@ -92,6 +103,8 @@ export class UserDetailComponent implements OnInit {
 
     this.isUpdating = true;
     const permissions = this.permissionsForm.value;
+
+    console.log(permissions);
 
     this.usersService
       .updateUserPermissions(this.userId, permissions)
