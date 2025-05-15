@@ -132,20 +132,22 @@
 
         <!-- Ciudad -->
         <div>
-          <label for="city" class="block text-sm font-medium text-gray-700 mb-1"
-            >Ciudad <span class="text-red-500">*</span></label
-          >
-          <input
-            type="text"
-            id="city"
-            formControlName="city"
-            placeholder="Ciudad de recepción"
+          <label
+            for="cityId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Selecciona una ciudad
+          </label>
+          <select
+            name="cityId"
+            id="cityId"
+            formControlName="cityId"
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            [ngClass]="{ 'border-red-500': isFieldInvalid('city') }"
-          />
-          <p *ngIf="isFieldInvalid('city')" class="mt-1 text-sm text-red-500">
-            {{ getErrorMessage('city') }}
-          </p>
+          >
+            <option value="">Selecciona una opcion</option>
+            <option *ngFor="let city of cities" [value]="city.id">
+              {{ city.name }}
+            </option>
+          </select>
         </div>
 
         <!-- Referencia -->

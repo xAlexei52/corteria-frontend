@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomersService } from 'src/app/_services/Customers/customers.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-customer-form',
@@ -17,12 +18,13 @@ export class CustomerFormComponent implements OnInit {
   alertMessage: string = '';
   isSuccess: boolean = false;
   isClosing: boolean = false;
-
+  cities: any[] = [];
   constructor(
     private fb: FormBuilder,
     private customersService: CustomersService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cityService: CityService
   ) {
     this.customerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -30,7 +32,7 @@ export class CustomerFormComponent implements OnInit {
       email: ['', [Validators.email]],
       phone: [''],
       address: [''],
-      city: [''],
+      cityId: [''],
     });
   }
 
@@ -41,6 +43,22 @@ export class CustomerFormComponent implements OnInit {
         this.isEditMode = true;
         this.loadCustomerData();
       }
+    });
+    this.loadCities();
+  }
+
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar las ciudades', false);
+        }
+      },
+      error: (err) => {
+        this.showAlert('Error al cargar las ciudades: ' + err.message, false);
+      },
     });
   }
 
@@ -57,7 +75,7 @@ export class CustomerFormComponent implements OnInit {
             email: customer.email,
             phone: customer.phone,
             address: customer.address,
-            city: customer.city,
+            cityId: customer.cityId,
           });
         } else {
           this.showAlert('Error al cargar los datos del cliente', false);

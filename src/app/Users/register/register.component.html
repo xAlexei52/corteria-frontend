@@ -185,6 +185,20 @@
               </small>
             </div>
           </div>
+          <div>
+            <select
+              name="ciudad"
+              id="ciudad"
+              [(ngModel)]="ciudad"
+              #ciudadInput="ngModel"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled selected>Selecciona tu país</option>
+              <option *ngFor="let city of cities" [value]="city.id">
+                {{ city.name }}
+              </option>
+            </select>
+          </div>
           <button
             type="submit"
             [disabled]="registerForm.form.invalid || isLoading"

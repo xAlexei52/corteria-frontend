@@ -230,9 +230,9 @@
             formControlName="city"
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Sin asignar</option>
-            <option *ngFor="let city of cityOptions" [value]="city.value">
-              {{ city.label }}
+            <option value="" selected disabled>Sin asignar</option>
+            <option *ngFor="let city of cities" [value]="city.id">
+              {{ city.name }}
             </option>
           </select>
         </div>

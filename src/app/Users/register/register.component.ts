@@ -1,35 +1,46 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UsersService } from 'src/app/_services/Users/users.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
   nombre: string = '';
   apellido: string = '';
   email: string = '';
   password: string = '';
+  ciudad: string = '';
   hidePassword: boolean = true;
   alertMessage: string = '';
   isSuccess: boolean = false;
   isLoading: boolean = false;
   isClosing: boolean = false;
+  cities: any[] = [];
 
   constructor(
-    private usersService: UsersService, 
-    private router: Router
+    private usersService: UsersService,
+    private router: Router,
+    private cityService: CityService
   ) {}
 
   togglePasswordVisibility() {
     this.hidePassword = !this.hidePassword;
   }
 
+  ngOnInit(): void {
+    this.loadCities();
+  }
+
   onRegister() {
     if (!this.isFormValid()) {
-      this.showAlert('Por favor, completa todos los campos correctamente', false);
+      this.showAlert(
+        'Por favor, completa todos los campos correctamente',
+        false
+      );
       return;
     }
 
@@ -40,7 +51,7 @@ export class RegisterComponent {
       lastName: this.apellido,
       email: this.email,
       password: this.password,
-      city: 'N/A'
+      cityId: this.ciudad, // Asignar la ciudad seleccionada
     };
 
     this.usersService.register(userData).subscribe({
@@ -48,35 +59,45 @@ export class RegisterComponent {
         this.isLoading = false;
         if (response.success) {
           // Mostramos el mensaje que viene de la API
-          this.showAlert(response.message || 'Registro exitoso. Tu cuenta está pendiente de activación.', true);
-          
+          this.showAlert(
+            response.message ||
+              'Registro exitoso. Tu cuenta está pendiente de activación.',
+            true
+          );
+
           // Guardamos los datos del usuario recién registrado para mostrarlos o usarlos si es necesario
           localStorage.setItem('tempUserData', JSON.stringify(response.user));
-          
+
           setTimeout(() => {
             this.router.navigate(['/login']);
           }, 3000); // Damos un poco más de tiempo para que el usuario lea el mensaje
         } else {
-          this.showAlert(response.message || 'Error en el registro. Por favor, intenta de nuevo.', false);
+          this.showAlert(
+            response.message ||
+              'Error en el registro. Por favor, intenta de nuevo.',
+            false
+          );
         }
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error en el registro', error);
         this.showAlert(
-          error.error?.message || 
-          'Hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.', 
+          error.error?.message ||
+            'Hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.',
           false
         );
-      }
+      },
     });
   }
 
   private isFormValid(): boolean {
-    return this.nombre.length >= 2 &&
-           this.apellido.length >= 2 &&
-           this.isValidEmail(this.email) &&
-           this.password.length >= 6;
+    return (
+      this.nombre.length >= 2 &&
+      this.apellido.length >= 2 &&
+      this.isValidEmail(this.email) &&
+      this.password.length >= 6
+    );
   }
 
   private isValidEmail(email: string): boolean {
@@ -96,5 +117,17 @@ export class RegisterComponent {
         this.isClosing = false;
       }, 300);
     }, 5000);
+  }
+
+  loadCities() {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        this.cities = response.cities;
+        console.log('Ciudades cargadas:', response);
+      },
+      error: (error) => {
+        console.error('Error al cargar las ciudades', error);
+      },
+    });
   }
 }
