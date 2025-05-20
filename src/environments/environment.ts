@@ -1,4 +1,4 @@
 export const environment = {
-  apiBase: 'https://corteria-backend.onrender.com/api',
-  documentsUrl: 'https://corteria-backend.onrender.com',
+  apiBase: 'http://localhost:3000/api',
+  documentsUrl: 'http://localhost:3000',
 };

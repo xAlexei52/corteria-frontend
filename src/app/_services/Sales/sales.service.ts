@@ -108,4 +108,27 @@ export class SalesService {
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
+
+  getRomaneo(saleDetailId: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/details/${saleDetailId}/romaneo`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Generar romaneo automáticamente
+  generateRomaneo(saleDetailId: string, data?: any): Observable<any> {
+    return this.http
+      .post<any>(
+        `${this.apiUrl}/details/${saleDetailId}/romaneo/generate`,
+        data || {}
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  // Actualizar un romaneo existente
+  updateRomaneo(saleDetailId: string, romaneoData: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/details/${saleDetailId}/romaneo`, romaneoData)
+      .pipe(catchError(this.handleError));
+  }
 }
