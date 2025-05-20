@@ -56,6 +56,7 @@ import { ProjectIncomeListComponent } from './Projects/project-income-list/proje
 import { ProjectIncomeFormComponent } from './Projects/project-income-form/project-income-form.component';
 import { WarehouseListComponent } from './Warehouses/warehouse-list/warehouse-list.component';
 import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/warehouse-inventory.component';
+import { SaleRomaneoComponent } from './Sales/sale-romaneo/sale-romaneo.component';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/wa
     ProjectIncomeFormComponent,
     WarehouseListComponent,
     WarehouseInventoryComponent,
+    SaleRomaneoComponent,
   ],
   imports: [
     BrowserModule,

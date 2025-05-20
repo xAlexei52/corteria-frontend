@@ -49,6 +49,7 @@ import { ProjectIncomeFormComponent } from './Projects/project-income-form/proje
 import { RoleGuard } from './_services/AuthService/role.guard';
 import { WarehouseListComponent } from './Warehouses/warehouse-list/warehouse-list.component';
 import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/warehouse-inventory.component';
+import { SaleRomaneoComponent } from './Sales/sale-romaneo/sale-romaneo.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -110,6 +111,7 @@ const routes: Routes = [
           { path: 'edit/:id', component: SaleFormComponent },
           { path: 'details/:id', component: SaleDetailComponent },
           { path: 'payment/:id', component: SalePaymentComponent },
+          { path: 'romaneo/:detailId', component: SaleRomaneoComponent },
           { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },

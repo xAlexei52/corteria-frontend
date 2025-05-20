@@ -191,4 +191,29 @@ export class SaleListComponent implements OnInit {
       }, 300);
     }, 5000);
   }
+
+  viewRomaneo(saleId: string): void {
+    // Primero obtenemos los detalles de la venta para obtener la lista de detalles
+    this.salesService.getSaleById(saleId).subscribe({
+      next: (response) => {
+        if (
+          response.success &&
+          response.sale.details &&
+          response.sale.details.length > 0
+        ) {
+          // Usamos el ID del primer detalle de venta (se puede mejorar para elegir el detalle específico)
+          const detailId = response.sale.details[0].id;
+          this.router.navigate([`/sales/romaneo/${detailId}`]);
+        } else {
+          this.showAlert('No hay detalles disponibles para esta venta', false);
+        }
+      },
+      error: (err) => {
+        this.showAlert(
+          'Error al obtener detalles de la venta: ' + err.message,
+          false
+        );
+      },
+    });
+  }
 }
