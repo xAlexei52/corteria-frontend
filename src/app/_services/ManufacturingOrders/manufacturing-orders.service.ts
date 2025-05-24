@@ -25,7 +25,7 @@ export class ManufacturingOrdersService {
       if (params.page) httpParams = httpParams.set('page', params.page);
       if (params.limit) httpParams = httpParams.set('limit', params.limit);
       if (params.status) httpParams = httpParams.set('status', params.status);
-      if (params.city) httpParams = httpParams.set('city', params.city);
+      if (params.cityId) httpParams = httpParams.set('cityId', params.cityId);
       if (params.startDate)
         httpParams = httpParams.set('startDate', params.startDate);
       if (params.endDate)

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TrailerEntriesService } from 'src/app/_services/TrailerEntry/trailer-entries.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { CityService } from 'src/app/_services/Cities/city.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -24,6 +25,7 @@ export class TrailerEntriesListComponent implements OnInit {
   // Para el modal de confirmación de eliminación
   showDeleteModal: boolean = false;
   entryToDelete: any = null;
+  cities: any[] = [];
 
   // Opciones para el filtro de procesamiento
   processingStatusOptions = [
@@ -37,12 +39,13 @@ export class TrailerEntriesListComponent implements OnInit {
   constructor(
     private trailerEntriesService: TrailerEntriesService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private cityService: CityService
   ) {
     this.filterForm = this.fb.group({
       startDate: [''],
       endDate: [''],
-      city: [''],
+      cityId: [''],
       supplier: [''],
       reference: [''],
       needsProcessing: [''],
@@ -52,6 +55,19 @@ export class TrailerEntriesListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEntries();
+    this.loadCities();
+  }
+
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar las ciudades', false);
+        }
+      },
+    });
   }
 
   loadEntries(): void {
@@ -108,7 +124,7 @@ export class TrailerEntriesListComponent implements OnInit {
     this.filterForm.reset({
       startDate: '',
       endDate: '',
-      city: '',
+      cityId: '',
       supplier: '',
       reference: '',
       needsProcessing: '',

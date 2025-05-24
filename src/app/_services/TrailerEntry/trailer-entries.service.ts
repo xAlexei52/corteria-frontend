@@ -25,7 +25,7 @@ export class TrailerEntriesService {
         httpParams = httpParams.set('startDate', params.startDate);
       if (params.endDate)
         httpParams = httpParams.set('endDate', params.endDate);
-      if (params.city) httpParams = httpParams.set('city', params.city);
+      if (params.cityId) httpParams = httpParams.set('cityId', params.cityId);
       if (params.supplier)
         httpParams = httpParams.set('supplier', params.supplier);
       if (params.productId)
