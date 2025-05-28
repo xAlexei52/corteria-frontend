@@ -1,13 +1,47 @@
-<!-- manufacturing-orders-list.component.html corregido -->
+<!-- expense-list.component.html -->
 <div class="p-6 bg-gray-100 min-h-screen">
   <div
     class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
   >
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">Órdenes de Fabricación</h1>
-      <p class="text-gray-600">
-        Gestiona las órdenes de fabricación y su procesamiento
-      </p>
+      <h1 class="text-2xl font-bold text-gray-800">Gastos de la Empresa</h1>
+      <p class="text-gray-600">Gestiona los gastos generales de la empresa</p>
+    </div>
+    <div class="flex space-x-3">
+      <button
+        (click)="viewStatistics()"
+        class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-green-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"
+          />
+        </svg>
+        Estadísticas
+      </button>
+      <button
+        (click)="createNewExpense()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Nuevo Gasto
+      </button>
     </div>
   </div>
 
@@ -15,34 +49,41 @@
   <div class="bg-white rounded-xl shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4">Filtros</h2>
     <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <div>
           <label
-            for="startDate"
+            for="search"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Fecha Inicial</label
+            >Buscar</label
           >
           <input
-            type="date"
-            id="startDate"
-            formControlName="startDate"
+            type="text"
+            id="search"
+            formControlName="search"
+            placeholder="Número referencia, notas..."
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div>
           <label
-            for="endDate"
+            for="category"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Fecha Final</label
+            >Categoría</label
           >
-          <input
-            type="date"
-            id="endDate"
-            formControlName="endDate"
+          <select
+            id="category"
+            formControlName="category"
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          >
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let cat of categories" [value]="cat.value">
+              {{ cat.label }}
+            </option>
+          </select>
         </div>
-        <div>
+
+        <div *ngIf="canViewAllCities()">
           <label
             for="cityId"
             class="block text-sm font-medium text-gray-700 mb-1"
@@ -59,23 +100,54 @@
             </option>
           </select>
         </div>
+
         <div>
           <label
-            for="status"
+            for="startDate"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Estado</label
+            >Fecha Desde</label
+          >
+          <input
+            type="date"
+            id="startDate"
+            formControlName="startDate"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label
+            for="endDate"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Fecha Hasta</label
+          >
+          <input
+            type="date"
+            id="endDate"
+            formControlName="endDate"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- NUEVO FILTRO FACTURABLE -->
+        <div>
+          <label
+            for="isBillable"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Facturable</label
           >
           <select
-            id="status"
-            formControlName="status"
+            id="isBillable"
+            formControlName="isBillable"
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option *ngFor="let option of statusOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
+            <option value="">Todos</option>
+            <option value="true">Facturable</option>
+            <option value="false">No Facturable</option>
           </select>
         </div>
       </div>
+
       <div class="flex justify-end mt-4 space-x-3">
         <button
           type="button"
@@ -94,18 +166,12 @@
     </form>
   </div>
 
-  <!-- Tabla de órdenes -->
+  <!-- Tabla de gastos -->
   <div class="bg-white rounded-xl shadow overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Número
-            </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -116,17 +182,24 @@
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Producto
+              Referencia
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Kilos
+              Categoría
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Monto
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              *ngIf="canViewAllCities()"
             >
               Ciudad
             </th>
@@ -134,13 +207,13 @@
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Almacén
+              Facturable
             </th>
             <th
               scope="col"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Estado
+              Archivo
             </th>
             <th
               scope="col"
@@ -153,7 +226,10 @@
         <tbody class="bg-white divide-y divide-gray-200">
           <!-- Estado de carga -->
           <tr *ngIf="isLoading">
-            <td colspan="8" class="px-6 py-4 text-center">
+            <td
+              [attr.colspan]="canViewAllCities() ? 8 : 7"
+              class="px-6 py-4 text-center"
+            >
               <div class="flex justify-center">
                 <svg
                   class="animate-spin h-6 w-6 text-blue-500"
@@ -180,46 +256,77 @@
           </tr>
 
           <!-- Sin resultados -->
-          <tr *ngIf="!isLoading && orders.length === 0">
-            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-              No se encontraron órdenes con los filtros seleccionados.
+          <tr *ngIf="!isLoading && expenses.length === 0">
+            <td
+              [attr.colspan]="canViewAllCities() ? 8 : 7"
+              class="px-6 py-4 text-center text-gray-500"
+            >
+              No se encontraron gastos con los filtros seleccionados.
             </td>
           </tr>
 
-          <!-- Lista de órdenes -->
-          <tr *ngFor="let order of orders" class="hover:bg-gray-50">
+          <!-- Lista de gastos -->
+          <tr *ngFor="let expense of expenses" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.orderNumber }}
+              {{ formatDate(expense.date) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.createdAt | date : 'dd/MM/yyyy HH:mm' }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.product?.name || 'Sin producto' }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.kilosToProcess }} kg
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.city.name }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ order.destinationWarehouse?.name || 'Sin asignar' }}
+              {{ expense.referenceNumber || 'Sin referencia' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
               <span
-                class="px-2 py-1 rounded-full text-xs"
-                [ngClass]="getStatusClass(order.status)"
+                class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
               >
-                {{ formatStatus(order.status) }}
+                {{ formatCategory(expense.category) }}
               </span>
+            </td>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              ${{ parseFloat(expense.amount).toFixed(2) }}
+            </td>
+            <td
+              *ngIf="canViewAllCities()"
+              class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+            >
+              {{ expense.city?.name || 'N/A' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span
+                class="px-2 py-1 rounded-full text-xs font-medium"
+                [ngClass]="
+                  expense.isBillable
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                "
+              >
+                {{ expense.isBillable ? 'Sí' : 'No' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div *ngIf="expense.fileName" class="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-green-600 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span class="text-green-600">Sí</span>
+              </div>
+              <span *ngIf="!expense.fileName" class="text-gray-400">No</span>
             </td>
             <td
               class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
             >
               <div class="flex justify-end space-x-2">
                 <button
-                  (click)="viewOrderDetails(order.id)"
+                  (click)="viewExpenseDetails(expense.id)"
                   class="text-blue-600 hover:text-blue-900"
                   title="Ver detalles"
                 >
@@ -238,18 +345,45 @@
                   </svg>
                 </button>
                 <button
-                  (click)="confirmDelete(order)"
+                  (click)="editExpense(expense.id)"
+                  class="text-indigo-600 hover:text-indigo-900"
+                  title="Editar"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  *ngIf="expense.fileName"
+                  (click)="downloadFile(expense)"
+                  class="text-green-600 hover:text-green-900"
+                  title="Descargar archivo"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+                <button
+                  *ngIf="canDelete()"
+                  (click)="deleteExpense(expense.id)"
                   class="text-red-600 hover:text-red-900"
                   title="Eliminar"
-                  [disabled]="
-                    order.status === 'in_progress' ||
-                    order.status === 'completed'
-                  "
-                  [ngClass]="{
-                    'opacity-50 cursor-not-allowed':
-                      order.status === 'in_progress' ||
-                      order.status === 'completed'
-                  }"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -273,6 +407,7 @@
 
     <!-- Paginación -->
     <div
+      *ngIf="totalPages > 0"
       class="px-6 py-4 flex items-center justify-between border-t border-gray-200 bg-gray-50"
     >
       <div class="flex-1 flex justify-between sm:hidden">
@@ -315,33 +450,12 @@
           <nav
             class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
             aria-label="Pagination"
-            *ngIf="totalPages > 0"
           >
-            <button
-              [disabled]="currentPage === 1"
-              (click)="onPageChange(1)"
-              [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
-              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              <span class="sr-only">Inicio</span>
-              <svg
-                class="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
             <button
               [disabled]="currentPage === 1"
               (click)="onPageChange(currentPage - 1)"
               [ngClass]="currentPage === 1 ? 'cursor-not-allowed' : ''"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Anterior</span>
               <svg
@@ -379,7 +493,7 @@
               [disabled]="currentPage === totalPages"
               (click)="onPageChange(currentPage + 1)"
               [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Siguiente</span>
               <svg
@@ -395,102 +509,9 @@
                 />
               </svg>
             </button>
-            <button
-              [disabled]="currentPage === totalPages"
-              (click)="onPageChange(totalPages)"
-              [ngClass]="currentPage === totalPages ? 'cursor-not-allowed' : ''"
-              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              <span class="sr-only">Fin</span>
-              <svg
-                class="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
           </nav>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de confirmación de eliminación -->
-<div
-  *ngIf="showDeleteModal"
-  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
->
-  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-    <div class="flex items-center justify-center text-red-600 mb-4">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-12 w-12"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    </div>
-    <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">
-      Confirmar Eliminación
-    </h3>
-    <p class="text-gray-600 mb-6 text-center">
-      ¿Estás seguro de que deseas eliminar esta orden?<br />
-      <span class="font-medium">Esta acción no se puede deshacer.</span>
-    </p>
-    <div class="flex justify-center space-x-4">
-      <button
-        (click)="cancelDelete()"
-        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-      >
-        Cancelar
-      </button>
-      <button
-        (click)="deleteOrder()"
-        [disabled]="isLoading"
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
-      >
-        <span *ngIf="!isLoading">Eliminar</span>
-        <span *ngIf="isLoading" class="flex items-center">
-          <svg
-            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          Procesando...
-        </span>
-      </button>
     </div>
   </div>
 </div>

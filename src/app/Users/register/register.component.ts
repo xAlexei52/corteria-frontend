@@ -31,9 +31,7 @@ export class RegisterComponent {
     this.hidePassword = !this.hidePassword;
   }
 
-  ngOnInit(): void {
-    this.loadCities();
-  }
+  ngOnInit(): void {}
 
   onRegister() {
     if (!this.isFormValid()) {
@@ -117,17 +115,5 @@ export class RegisterComponent {
         this.isClosing = false;
       }, 300);
     }, 5000);
-  }
-
-  loadCities() {
-    this.cityService.getCities().subscribe({
-      next: (response) => {
-        this.cities = response.cities;
-        console.log('Ciudades cargadas:', response);
-      },
-      error: (error) => {
-        console.error('Error al cargar las ciudades', error);
-      },
-    });
   }
 }

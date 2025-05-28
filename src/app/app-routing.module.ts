@@ -50,6 +50,10 @@ import { RoleGuard } from './_services/AuthService/role.guard';
 import { WarehouseListComponent } from './Warehouses/warehouse-list/warehouse-list.component';
 import { WarehouseInventoryComponent } from './Warehouses/warehouse-inventory/warehouse-inventory.component';
 import { SaleRomaneoComponent } from './Sales/sale-romaneo/sale-romaneo.component';
+import { ExpenseListComponent } from './CompanyExpenses/expense-list/expense-list.component';
+import { ExpenseFormComponent } from './CompanyExpenses/expense-form/expense-form.component';
+import { ExpenseDetailComponent } from './CompanyExpenses/expense-detail/expense-detail.component';
+import { ExpenseStatisticsComponent } from './CompanyExpenses/expense-statistics/expense-statistics.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -188,6 +192,17 @@ const routes: Routes = [
             component: ProjectIncomeFormComponent,
           },
           { path: 'incomes/edit/:id', component: ProjectIncomeFormComponent },
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+        ],
+      },
+      {
+        path: 'company-expenses',
+        children: [
+          { path: 'list', component: ExpenseListComponent },
+          { path: 'new', component: ExpenseFormComponent }, // Lo agregaremos después
+          { path: 'edit/:id', component: ExpenseFormComponent }, // Lo agregaremos después
+          { path: 'details/:id', component: ExpenseDetailComponent }, // Lo agregaremos después
+          { path: 'statistics', component: ExpenseStatisticsComponent }, // Lo agregaremos después
           { path: '', redirectTo: 'list', pathMatch: 'full' },
         ],
       },

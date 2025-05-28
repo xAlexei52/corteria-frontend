@@ -1,4 +1,4 @@
-// manufacturing-orders.service.ts
+// src/app/_services/CompanyExpenses/company-expenses.service.ts
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
@@ -12,32 +12,28 @@ import { environment } from 'src/environments/environment.development';
 @Injectable({
   providedIn: 'root',
 })
-export class ManufacturingOrdersService {
-  private apiUrl = `${environment.apiBase}/manufacturing-orders`;
+export class CompanyExpensesService {
+  private apiUrl = `${environment.apiBase}/company-expenses`;
 
   constructor(private http: HttpClient) {}
 
-  // Obtener listado de órdenes con filtros opcionales
-  getManufacturingOrders(params?: any): Observable<any> {
+  // Obtener listado de gastos con filtros opcionales
+  getExpenses(params?: any): Observable<any> {
     let httpParams = new HttpParams();
 
     if (params) {
       if (params.page) httpParams = httpParams.set('page', params.page);
       if (params.limit) httpParams = httpParams.set('limit', params.limit);
-      if (params.status) httpParams = httpParams.set('status', params.status);
-      if (params.cityId) httpParams = httpParams.set('cityId', params.cityId);
+      if (params.search) httpParams = httpParams.set('search', params.search);
+      if (params.category)
+        httpParams = httpParams.set('category', params.category);
       if (params.startDate)
         httpParams = httpParams.set('startDate', params.startDate);
       if (params.endDate)
         httpParams = httpParams.set('endDate', params.endDate);
-      if (params.productId)
-        httpParams = httpParams.set('productId', params.productId);
-      // Nuevo parámetro
-      if (params.calculationStatus)
-        httpParams = httpParams.set(
-          'calculationStatus',
-          params.calculationStatus
-        );
+      if (params.cityId) httpParams = httpParams.set('cityId', params.cityId);
+      if (params.isBillable !== undefined)
+        httpParams = httpParams.set('isBillable', params.isBillable);
     }
 
     return this.http
@@ -45,52 +41,58 @@ export class ManufacturingOrdersService {
       .pipe(catchError(this.handleError));
   }
 
-  // Obtener una orden por ID
-  getManufacturingOrderById(id: string): Observable<any> {
+  // Obtener un gasto por ID
+  getExpenseById(id: string): Observable<any> {
     return this.http
       .get<any>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Crear una nueva orden de manufactura
-  createManufacturingOrder(orderData: any): Observable<any> {
+  // Crear un nuevo gasto
+  createExpense(expenseData: FormData): Observable<any> {
     return this.http
-      .post<any>(this.apiUrl, orderData)
+      .post<any>(this.apiUrl, expenseData)
       .pipe(catchError(this.handleError));
   }
 
-  // Actualizar el estado de una orden
-  updateOrderStatus(id: string, statusData: any): Observable<any> {
+  // Actualizar un gasto existente
+  updateExpense(id: string, expenseData: FormData): Observable<any> {
     return this.http
-      .patch<any>(`${this.apiUrl}/${id}/status`, statusData)
+      .put<any>(`${this.apiUrl}/${id}`, expenseData)
       .pipe(catchError(this.handleError));
   }
 
-  // Agregar gastos a una orden
-  addOrderExpenses(id: string, expenses: any[]): Observable<any> {
-    return this.http
-      .post<any>(`${this.apiUrl}/${id}/expenses`, { expenses })
-      .pipe(catchError(this.handleError));
-  }
-
-  // Agregar subproductos a una orden
-  addOrderSubproducts(id: string, subproducts: any[]): Observable<any> {
-    return this.http
-      .post<any>(`${this.apiUrl}/${id}/subproducts`, { subproducts })
-      .pipe(catchError(this.handleError));
-  }
-
-  // Calcular costos y rentabilidad de una orden
-  calculateOrderCosts(id: string, calculationData: any): Observable<any> {
-    return this.http
-      .post<any>(`${this.apiUrl}/${id}/calculate`, calculationData)
-      .pipe(catchError(this.handleError));
-  }
-
-  // Eliminar una orden
-  deleteManufacturingOrder(id: string): Observable<any> {
+  // Eliminar un gasto
+  deleteExpense(id: string): Observable<any> {
     return this.http
       .delete<any>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener estadísticas de gastos
+  getStatistics(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.startDate)
+        httpParams = httpParams.set('startDate', params.startDate);
+      if (params.endDate)
+        httpParams = httpParams.set('endDate', params.endDate);
+      if (params.cityId) httpParams = httpParams.set('cityId', params.cityId);
+    }
+
+    return this.http
+      .get<any>(`${this.apiUrl}/statistics`, { params: httpParams })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Descargar archivo adjunto
+  downloadFile(id: string): Observable<Blob> {
+    return this.http
+      .get(`${this.apiUrl}/${id}/download`, {
+        responseType: 'blob',
+        observe: 'body',
+      })
       .pipe(catchError(this.handleError));
   }
 

@@ -1,0 +1,383 @@
+<!-- expense-form.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{ isEditMode ? 'Editar Gasto' : 'Nuevo Gasto de la Empresa' }}
+      </h1>
+      <p class="text-gray-600">
+        {{
+          isEditMode
+            ? 'Actualiza la información del gasto'
+            : 'Registra un nuevo gasto de la empresa'
+        }}
+      </p>
+    </div>
+    <button
+      (click)="cancel()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading && isEditMode" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="!isLoading || !isEditMode" class="bg-white rounded-xl shadow p-6">
+    <form [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Fecha -->
+        <div>
+          <label for="date" class="block text-sm font-medium text-gray-700 mb-1"
+            >Fecha <span class="text-red-500">*</span></label
+          >
+          <input
+            type="date"
+            id="date"
+            formControlName="date"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('date') }"
+          />
+          <p *ngIf="isFieldInvalid('date')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('date') }}
+          </p>
+        </div>
+
+        <!-- Monto -->
+        <div>
+          <label
+            for="amount"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Monto <span class="text-red-500">*</span></label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span class="text-gray-500 sm:text-sm">$</span>
+            </div>
+            <input
+              type="number"
+              id="amount"
+              formControlName="amount"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              class="w-full pl-7 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [ngClass]="{ 'border-red-500': isFieldInvalid('amount') }"
+            />
+          </div>
+          <p *ngIf="isFieldInvalid('amount')" class="mt-1 text-sm text-red-500">
+            {{ getErrorMessage('amount') }}
+          </p>
+        </div>
+
+        <!-- Número de Referencia -->
+        <div>
+          <label
+            for="referenceNumber"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Número de Referencia</label
+          >
+          <input
+            type="text"
+            id="referenceNumber"
+            formControlName="referenceNumber"
+            placeholder="Número de factura, ticket, etc."
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p class="mt-1 text-xs text-gray-500">
+            Opcional: número de factura, recibo o referencia
+          </p>
+        </div>
+
+        <!-- Categoría -->
+        <div>
+          <label
+            for="category"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Categoría <span class="text-red-500">*</span></label
+          >
+          <select
+            id="category"
+            formControlName="category"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [ngClass]="{ 'border-red-500': isFieldInvalid('category') }"
+          >
+            <option *ngFor="let cat of categories" [value]="cat.value">
+              {{ cat.label }}
+            </option>
+          </select>
+          <p
+            *ngIf="isFieldInvalid('category')"
+            class="mt-1 text-sm text-red-500"
+          >
+            {{ getErrorMessage('category') }}
+          </p>
+        </div>
+
+        <!-- Ciudad (solo admin) -->
+        <div *ngIf="canSelectCity()">
+          <label
+            for="cityId"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Ciudad</label
+          >
+          <select
+            id="cityId"
+            formControlName="cityId"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Selecciona una ciudad</option>
+            <option *ngFor="let city of cities" [value]="city.id">
+              {{ city.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- NUEVO CAMPO: Es Facturable -->
+        <div class="flex items-center">
+          <div class="flex items-center h-5">
+            <input
+              id="isBillable"
+              type="checkbox"
+              formControlName="isBillable"
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="isBillable" class="font-medium text-gray-700">
+              Gasto Facturable/Deducible
+            </label>
+            <p class="text-gray-500">
+              Marca si este gasto es deducible fiscalmente
+            </p>
+          </div>
+        </div>
+
+        <!-- Archivo adjunto -->
+        <div class="md:col-span-2">
+          <label for="file" class="block text-sm font-medium text-gray-700 mb-1"
+            >Archivo Adjunto</label
+          >
+          <input
+            type="file"
+            id="file"
+            (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p class="mt-1 text-xs text-gray-500">
+            Formatos permitidos: PDF, imágenes (JPG, PNG, WEBP), documentos de
+            Word. Tamaño máximo: 10MB
+          </p>
+
+          <!-- Mostrar archivo actual en modo edición -->
+          <div *ngIf="isEditMode && currentFileName" class="mt-2">
+            <p class="text-sm text-blue-600">
+              📎 Archivo actual: {{ currentFileName }}
+            </p>
+            <p class="text-xs text-gray-500">
+              Selecciona un nuevo archivo para reemplazarlo
+            </p>
+          </div>
+
+          <!-- Mostrar archivo seleccionado -->
+          <div *ngIf="selectedFile" class="mt-2">
+            <p class="text-sm text-green-600">
+              📎 Nuevo archivo: {{ selectedFile.name }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <div class="md:col-span-2">
+          <label
+            for="notes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Notas</label
+          >
+          <textarea
+            id="notes"
+            formControlName="notes"
+            rows="3"
+            placeholder="Descripción adicional del gasto..."
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+          <p class="mt-1 text-xs text-gray-500">
+            Opcional: descripción adicional, detalles del gasto, etc.
+          </p>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="expenseForm.invalid || isLoading"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          [ngClass]="{
+            'opacity-50 cursor-not-allowed': expenseForm.invalid || isLoading
+          }"
+        >
+          <span *ngIf="!isLoading">{{
+            isEditMode ? 'Actualizar Gasto' : 'Registrar Gasto'
+          }}</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Información adicional -->
+  <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          class="h-5 w-5 text-blue-400"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">
+          Información importante
+        </h3>
+        <div class="mt-2 text-sm text-blue-700">
+          <ul class="list-disc list-inside space-y-1">
+            <li>
+              Todos los gastos registrados quedan vinculados a tu usuario para
+              auditoría
+            </li>
+            <li *ngIf="!canSelectCity()">
+              Los gastos se registran automáticamente para tu ciudad asignada
+            </li>
+            <li>
+              Es recomendable adjuntar el comprobante (factura, recibo, etc.)
+              cuando sea posible
+            </li>
+            <li>
+              La fecha del gasto puede ser diferente a la fecha de registro
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>

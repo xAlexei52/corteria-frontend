@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ManufacturingOrdersService } from 'src/app/_services/ManufacturingOrders/manufacturing-orders.service';
+import { CityService } from 'src/app/_services/Cities/city.service';
 
 @Component({
   selector: 'app-manufacturing-orders-list',
@@ -22,6 +23,8 @@ export class ManufacturingOrdersListComponent implements OnInit {
   isSuccess: boolean = false;
   isClosing: boolean = false;
 
+  cities: any[] = [];
+
   // Opciones para el filtro de estado
   statusOptions = [
     { value: '', label: 'Todos los estados' },
@@ -37,12 +40,13 @@ export class ManufacturingOrdersListComponent implements OnInit {
   constructor(
     private manufacturingOrdersService: ManufacturingOrdersService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private cityService: CityService
   ) {
     this.filterForm = this.fb.group({
       startDate: [''],
       endDate: [''],
-      city: [''],
+      cityId: [''],
       status: [''],
       productId: [''],
     });
@@ -50,6 +54,19 @@ export class ManufacturingOrdersListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
+    this.loadCities();
+  }
+
+  loadCities(): void {
+    this.cityService.getCities().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.cities;
+        } else {
+          this.showAlert('Error al cargar las ciudades', false);
+        }
+      },
+    });
   }
 
   loadOrders(): void {
@@ -105,7 +122,7 @@ export class ManufacturingOrdersListComponent implements OnInit {
     this.filterForm.reset({
       startDate: '',
       endDate: '',
-      city: '',
+      cityId: '',
       status: '',
       productId: '',
     });

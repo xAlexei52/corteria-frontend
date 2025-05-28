@@ -1,0 +1,411 @@
+<!-- expense-detail.component.html -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div
+    class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Detalles del Gasto</h1>
+      <p class="text-gray-600">Información completa del gasto de la empresa</p>
+    </div>
+    <button
+      (click)="goBack()"
+      class="text-gray-700 px-4 py-2 mt-2 md:mt-0 rounded-lg flex items-center hover:bg-gray-200 transition-colors border border-gray-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <svg
+      class="animate-spin h-10 w-10 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- Información no encontrada -->
+  <div
+    *ngIf="!isLoading && !expense"
+    class="bg-white rounded-xl shadow p-6 text-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-16 w-16 text-gray-400 mx-auto mb-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">
+      Gasto no encontrado
+    </h2>
+    <p class="text-gray-600 mb-4">
+      No se encontró la información del gasto solicitado.
+    </p>
+    <button
+      (click)="goBack()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+    >
+      Volver a la lista
+    </button>
+  </div>
+
+  <!-- Detalles del gasto -->
+  <div
+    *ngIf="!isLoading && expense"
+    class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+  >
+    <!-- Columna izquierda: Información principal -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Tarjeta de información básica -->
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <!-- Cabecera con acciones -->
+        <div
+          class="p-6 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center"
+        >
+          <div class="flex items-center">
+            <div
+              class="flex-shrink-0 h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold"
+            >
+              $
+            </div>
+            <div class="ml-4">
+              <h2 class="text-xl font-semibold text-gray-800">
+                ${{ parseFloat(expense.amount).toFixed(2) }}
+              </h2>
+              <p class="text-gray-600">
+                {{ formatDate(expense.date) }}
+              </p>
+            </div>
+          </div>
+          <div class="flex mt-4 md:mt-0 space-x-3">
+            <button
+              *ngIf="canEdit()"
+              (click)="editExpense()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                />
+              </svg>
+              Editar
+            </button>
+            <button
+              *ngIf="expense.fileName"
+              (click)="downloadFile()"
+              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Descargar
+            </button>
+            <button
+              *ngIf="canDelete()"
+              (click)="deleteExpense()"
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Eliminar
+            </button>
+          </div>
+        </div>
+
+        <!-- Información detallada -->
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            Información del Gasto
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 mb-1">Categoría</h4>
+              <span
+                class="px-3 py-1 rounded-full text-sm font-medium"
+                [ngClass]="getCategoryClass(expense.category)"
+              >
+                {{ formatCategory(expense.category) }}
+              </span>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 mb-1">
+                Número de Referencia
+              </h4>
+              <p class="text-gray-900">
+                {{ expense.referenceNumber || 'Sin número de referencia' }}
+              </p>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 mb-1">
+                Es Facturable
+              </h4>
+              <span
+                class="px-3 py-1 rounded-full text-sm font-medium"
+                [ngClass]="
+                  expense.isBillable
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                "
+              >
+                {{ expense.isBillable ? 'Sí - Deducible' : 'No - Personal' }}
+              </span>
+            </div>
+            <div *ngIf="shouldShowCity()">
+              <h4 class="text-sm font-medium text-gray-500 mb-1">Ciudad</h4>
+              <p class="text-gray-900">
+                {{ expense.city?.name || 'No especificada' }}
+              </p>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 mb-1">
+                Fecha del Gasto
+              </h4>
+              <p class="text-gray-900">{{ formatDate(expense.date) }}</p>
+            </div>
+          </div>
+
+          <!-- Notas -->
+          <div class="mt-6" *ngIf="expense.notes">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">Notas</h4>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <p class="text-gray-900 whitespace-pre-wrap">
+                {{ expense.notes }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Sin notas -->
+          <div class="mt-6" *ngIf="!expense.notes">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">Notas</h4>
+            <p class="text-gray-400 italic">
+              No se agregaron notas adicionales
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información de auditoría -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          Información de Auditoría
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-sm font-medium text-gray-500 mb-1">Creado por</h4>
+            <p class="text-gray-900">
+              {{ expense.creator?.firstName }} {{ expense.creator?.lastName }}
+            </p>
+            <p class="text-sm text-gray-500">{{ expense.creator?.email }}</p>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium text-gray-500 mb-1">
+              Fecha de Registro
+            </h4>
+            <p class="text-gray-900">{{ formatDateTime(expense.createdAt) }}</p>
+          </div>
+          <div *ngIf="expense.updatedAt !== expense.createdAt">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">
+              Última Actualización
+            </h4>
+            <p class="text-gray-900">{{ formatDateTime(expense.updatedAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Archivo adjunto -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Archivo adjunto -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          Archivo Adjunto
+        </h3>
+
+        <div *ngIf="expense.fileName" class="space-y-4">
+          <!-- Información del archivo -->
+          <div class="border rounded-lg p-4 bg-gray-50">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <span class="text-2xl mr-2">{{
+                  getFileIcon(expense.fileType)
+                }}</span>
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900">
+                    {{ expense.fileName }}
+                  </h4>
+                  <p class="text-xs text-gray-500">
+                    Tipo: {{ expense.fileType }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de descarga -->
+            <button
+              (click)="downloadFile()"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Descargar Archivo
+            </button>
+          </div>
+        </div>
+
+        <!-- Sin archivo -->
+        <div *ngIf="!expense.fileName" class="text-center py-8">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 text-gray-400 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h4 class="text-sm font-medium text-gray-700 mb-1">
+            Sin archivo adjunto
+          </h4>
+          <p class="text-xs text-gray-500">
+            Este gasto no tiene documentos adjuntos
+          </p>
+        </div>
+      </div>
+
+      <!-- Resumen del monto -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          Resumen del Gasto
+        </h3>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-center">
+            <p class="text-sm text-gray-500 mb-1">Monto Total</p>
+            <p class="text-3xl font-bold text-gray-900">
+              ${{ parseFloat(expense.amount).toFixed(2) }}
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+              {{ formatCategory(expense.category) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de notificación -->
+<div
+  *ngIf="alertMessage"
+  class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white flex items-center max-w-md transition-opacity duration-300"
+  [ngClass]="{
+    'bg-green-600': isSuccess,
+    'bg-red-600': !isSuccess,
+    'opacity-0': isClosing
+  }"
+>
+  <svg
+    *ngIf="isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+  <svg
+    *ngIf="!isSuccess"
+    class="w-6 h-6 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    ></path>
+  </svg>
+  {{ alertMessage }}
+</div>
